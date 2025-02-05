@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shift Reading</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #reading-area {
+      margin-top: 20px;
+      font-size: 20px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: #fff;
+    }
+    .highlight {
+      background-color: yellow;
+    }
+    .controls {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Shift Reading</h1>
+  <textarea id="text-input" placeholder="Cole seu texto aqui..."></textarea><br>
+  <button id="send-btn">Enviar</button>
+
+  <div class="controls" style="display: none;">
+    <button id="play-pause-btn">Play</button>
+    <button id="increase-font-btn">Aumentar Fonte</button>
+    <button id="decrease-font-btn">Diminuir Fonte</button>
+    <button id="increase-speed-btn">Aumentar Velocidade</button>
+    <button id="decrease-speed-btn">Diminuir Velocidade</button>
+  </div>
+
+  <div id="reading-area" style="display: none;"></div>
+
+  <script>
+    const textInput = document.getElementById('text-input');
+    const sendBtn = document.getElementById('send-btn');
+    const readingArea = document.getElementById('reading-area');
+    const controls = document.querySelector('.controls');
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    const increaseFontBtn = document.getElementById('increase-font-btn');
+    const decreaseFontBtn = document.getElementById('decrease-font-btn');
+    const increaseSpeedBtn = document.getElementById('increase-speed-btn');
+    const decreaseSpeedBtn = document.getElementById('decrease-speed-btn');
+
+    let words = [];
+    let currentIndex = 0;
+    let intervalId = null;
+    let speed = 300; // Velocidade inicial em milissegundos
+    let fontSize = 20; // Tamanho inicial da fonte
+
+    sendBtn.addEventListener('click', () => {
+      const text = textInput.value.trim();
+      if (text) {
+        words = text.split(/\s+/);
+        currentIndex = 0;
+        readingArea.innerHTML = words.map(word => `<span>${word}</span>`).join(' ');
+        readingArea.style.display = 'block';
+        controls.style.display = 'flex';
+        controls.style.gap = '10px';
+      }
+    });
+
+    playPauseBtn.addEventListener('click', () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+        playPauseBtn.textContent = 'Play';
+      } else {
+        intervalId = setInterval(highlightNextWord, speed);
+        playPauseBtn.textContent = 'Pausar';
+      }
+    });
+
+    increaseFontBtn.addEventListener('click', () => {
+      fontSize += 2;
+      readingArea.style.fontSize = `${fontSize}px`;
+    });
+
+    decreaseFontBtn.addEventListener('click', () => {
+      if (fontSize > 8) {
+        fontSize -= 2;
+        readingArea.style.fontSize = `${fontSize}px`;
+      }
+    });
+
+    increaseSpeedBtn.addEventListener('click', () => {
+      if (speed > 50) {
+        speed -= 50;
+        resetInterval();
+      }
+    });
+
+    decreaseSpeedBtn.addEventListener('click', () => {
+      speed += 50;
+      resetInterval();
+    });
+
+    function highlightNextWord() {
+      const spans = readingArea.querySelectorAll('span');
+      if (currentIndex >= spans.length) {
+        clearInterval(intervalId);
+        intervalId = null;
+        playPauseBtn.textContent = 'Play';
+        return;
+      }
+      spans.forEach((span, index) => {
+        span.classList.toggle('highlight', index === currentIndex);
+      });
+      currentIndex++;
+    }
+
+    function resetInterval() {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = setInterval(highlightNextWord, speed);
+      }
+    }
+  </script>
+</body>
+</html>
