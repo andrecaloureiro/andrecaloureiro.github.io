@@ -1,7 +1,202 @@
 [
-  { "id": 1, "letter": "c", "text": "Tenho dificuldade em acessar ou expressar minhas próprias emoções profundas." },
-  { "id": 2, "letter": "a", "text": "Às vezes, sou visto(a) como insensível ou indiferente às emoções dos outros." },
-  { "id": 3, "letter": "d", "text": "Posso subestimar a gravidade de certas situações porque não me sinto afetado(a) emocionalmente." },
-  { "id": 4, "letter": "b", "text": "Sou frequentemente descrito(a) como uma pessoa organizada e metódica." },
-  { "id": 5, "letter": "e", "text": "Gosto de experimentar coisas novas e sair da minha zona de conforto." }
+  {
+    "id": 1,
+    "categoria": "ABE",
+    "text": "Eu adoro explorar novas ideias e conceitos."
+  },
+  {
+    "id": 2,
+    "categoria": "ABE",
+    "text": "Tenho uma mente aberta e estou sempre disposto(a) a considerar diferentes perspectivas."
+  },
+  {
+    "id": 3,
+    "categoria": "ABE-",
+    "text": "Prefiro manter-me fiel ao que conheço e ao que funciona."
+  },
+  {
+    "id": 4,
+    "categoria": "ABE-",
+    "text": "Evito mudanças desnecessárias porque elas podem causar confusão."
+  },
+  {
+    "id": 5,
+    "categoria": "CON",
+    "text": "Sou extremamente organizado(a) e gosto de planejar tudo com antecedência."
+  },
+  {
+    "id": 6,
+    "categoria": "CON",
+    "text": "Sempre cumpro minhas tarefas e compromissos dentro dos prazos estipulados."
+  },
+  {
+    "id": 7,
+    "categoria": "CON-",
+    "text": "Às vezes, procrastino tarefas importantes até o último minuto."
+  },
+  {
+    "id": 8,
+    "categoria": "CON-",
+    "text": "Tenho dificuldade em cumprir prazos ou compromissos porque não planejo bem meu tempo."
+  },
+  {
+    "id": 9,
+    "categoria": "EXT",
+    "text": "Eu me sinto mais energizado(a) quando estou cercado(a) de pessoas."
+  },
+  {
+    "id": 10,
+    "categoria": "EXT",
+    "text": "Adoro conhecer novas pessoas e fazer amigos rapidamente."
+  },
+  {
+    "id": 11,
+    "categoria": "EXT-",
+    "text": "Prefiro passar um tempo sozinho(a) para recarregar minhas energias."
+  },
+  {
+    "id": 12,
+    "categoria": "EXT-",
+    "text": "Tenho dificuldade em iniciar conversas ou me envolver em grupos grandes."
+  },
+  {
+    "id": 13,
+    "categoria": "AGR",
+    "text": "Gosto de ajudar os outros e me sinto bem quando posso fazer algo por alguém."
+  },
+  {
+    "id": 14,
+    "categoria": "AGR",
+    "text": "Sou muito empático(a) e consigo entender facilmente os sentimentos das pessoas ao meu redor."
+  },
+  {
+    "id": 15,
+    "categoria": "AGR-",
+    "text": "Às vezes, sou percebido(a) como rude ou insensível por não considerar os sentimentos dos outros."
+  },
+  {
+    "id": 16,
+    "categoria": "AGR-",
+    "text": "Tenho dificuldade em colaborar em equipe porque prefiro agir sozinho(a)."
+  },
+  {
+    "id": 17,
+    "categoria": "NEU",
+    "text": "Sou emocionalmente estável e raramente me sinto sobrecarregado(a) por estresse."
+  },
+  {
+    "id": 18,
+    "categoria": "NEU",
+    "text": "Consigo manter a calma mesmo em situações difíceis ou imprevisíveis."
+  },
+  {
+    "id": 19,
+    "categoria": "NEU-",
+    "text": "Às vezes, fico ansioso(a) ou preocupado(a) sem motivo aparente."
+  },
+  {
+    "id": 20,
+    "categoria": "NEU-",
+    "text": "Tenho dificuldade em lidar com situações estressantes e posso reagir de forma exagerada."
+  },
+  {
+    "id": 21,
+    "categoria": "ABE",
+    "text": "Minha criatividade me ajuda a resolver problemas de maneiras inovadoras."
+  },
+  {
+    "id": 22,
+    "categoria": "ABE",
+    "text": "Sou apaixonado(a) por arte, música e expressões culturais."
+  },
+  {
+    "id": 23,
+    "categoria": "ABE-",
+    "text": "Não me sinto confortável explorando temas abstratos ou filosóficos."
+  },
+  {
+    "id": 24,
+    "categoria": "ABE-",
+    "text": "Prefiro atividades concretas e objetivas, como esportes ou hobbies manuais."
+  },
+  {
+    "id": 25,
+    "categoria": "CON",
+    "text": "Sou detalhista e prezo pela qualidade em tudo o que faço."
+  },
+  {
+    "id": 26,
+    "categoria": "CON",
+    "text": "As pessoas confiam em mim porque sou confiável e cumpre o que prometo."
+  },
+  {
+    "id": 27,
+    "categoria": "CON-",
+    "text": "Deixo de lado detalhes importantes porque prefiro focar no que é mais divertido ou interessante."
+  },
+  {
+    "id": 28,
+    "categoria": "CON-",
+    "text": "Posso me envolver em projetos sem pensar nas consequências ou no esforço necessário."
+  },
+  {
+    "id": 29,
+    "categoria": "EXT",
+    "text": "Meu entusiasmo é contagiante, e as pessoas gostam de estar perto de mim."
+  },
+  {
+    "id": 30,
+    "categoria": "EXT",
+    "text": "Gosto de participar de eventos sociais, festas e atividades em grupo."
+  },
+  {
+    "id": 31,
+    "categoria": "EXT-",
+    "text": "Evito atividades que exijam muita exposição ou atenção pública."
+  },
+  {
+    "id": 32,
+    "categoria": "EXT-",
+    "text": "As vezes sou visto(a) como tímido(a) ou pouco acessível."
+  },
+  {
+    "id": 33,
+    "categoria": "AGR",
+    "text": "Sou flexível e estou disposto(a) a ceder em situações de desacordo para manter a harmonia."
+  },
+  {
+    "id": 34,
+    "categoria": "AGR",
+    "text": "Sempre tento ver o lado bom das pessoas e acredito na bondade humana."
+  },
+  {
+    "id": 35,
+    "categoria": "AGR-",
+    "text": "Posso ser competitivo(a) ou crítico(a) demais, o que pode afastar as pessoas."
+  },
+  {
+    "id": 36,
+    "categoria": "AGR-",
+    "text": "Evito compromissos emocionais profundos porque prefiro focar em resultados práticos."
+  },
+  {
+    "id": 37,
+    "categoria": "NEU",
+    "text": "Tenho confiança em minha capacidade de lidar com desafios e adversidades."
+  },
+  {
+    "id": 38,
+    "categoria": "NEU",
+    "text": "Minha mente é geralmente positiva e otimista, o que me ajuda a enfrentar obstáculos."
+  },
+  {
+    "id": 39,
+    "categoria": "NEU-",
+    "text": "Frequentemente me preocupo com coisas que estão fora do meu controle."
+  },
+  {
+    "id": 40,
+    "categoria": "NEU-",
+    "text": "Posso interpretar situações neutras como ameaçadoras ou negativas."
+  }
 ]
