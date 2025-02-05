@@ -58,7 +58,13 @@
   // Variáveis globais
   let frases = [];
   let indiceAtual = 0;
-  let pontuacao = { ABE: 0, CON: 0, EXT: 0, AGR: 0, NEU: 0 };
+  let pontuacao = {
+    ABE: 0, "ABE-": 0,
+    CON: 0, "CON-": 0,
+    EXT: 0, "EXT-": 0,
+    AGR: 0, "AGR-": 0,
+    NEU: 0, "NEU-": 0
+  };
 
   // Carregar frases do arquivo JSON
   fetch('frases.json')
@@ -82,20 +88,12 @@
   // Função para capturar a resposta do usuário
   function responder(resposta) {
     const fraseAtual = frases[indiceAtual];
-    const categoria = fraseAtual.categoria.replace('-', ''); // Remove o modificador '-' se existir
+    const categoria = fraseAtual.categoria; // Categoria com ou sem modificador '-'
 
     if (resposta === 'concordo') {
-      if (fraseAtual.categoria.includes('-')) {
-        pontuacao[categoria] -= 1; // Respostas negativas diminuem a pontuação
-      } else {
-        pontuacao[categoria] += 1; // Respostas positivas aumentam a pontuação
-      }
+      pontuacao[categoria] += 1; // Incrementa a pontuação da categoria específica
     } else if (resposta === 'discordo') {
-      if (fraseAtual.categoria.includes('-')) {
-        pontuacao[categoria] += 1; // Discordar de uma afirmação negativa aumenta a pontuação
-      } else {
-        pontuacao[categoria] -= 1; // Discordar de uma afirmação positiva diminui a pontuação
-      }
+      pontuacao[categoria] -= 1; // Decrementa a pontuação da categoria específica
     }
 
     // Avançar para a próxima frase
@@ -109,11 +107,14 @@
     document.getElementById('resultado').innerText = '';
     document.getElementById('resultadoFinal').innerHTML = `
       <h2>Resultado Final:</h2>
-      <p><strong>Abertura à Experiência (ABE):</strong> ${pontuacao.ABE}</p>
-      <p><strong>Conscienciosidade (CON):</strong> ${pontuacao.CON}</p>
-      <p><strong>Extroversão (EXT):</strong> ${pontuacao.EXT}</p>
-      <p><strong>Agradabilidade (AGR):</strong> ${pontuacao.AGR}</p>
-      <p><strong>Neuroticismo (NEU):</strong> ${pontuacao.NEU}</p>
+      <p><strong>Abertura à Experiência (ABE / ABE-):</strong> ${pontuacao.ABE} / ${pontuacao["ABE-"]}</p>
+      <p><strong>Conscienciosidade (CON / CON-):</strong> ${pontuacao.CON} / ${pontuacao["CON-"]}</p>
+      <p><strong>Extroversão (EXT / EXT-):</strong> ${pontuacao.EXT} / ${pontuacao["EXT-"]}</p>
+      <p><strong>Agradabilidade (AGR / AGR-):</strong> ${pontuacao.AGR} / ${pontuacao["AGR-"]}</p>
+      <p><strong>Neuroticismo (NEU / NEU-):</strong> ${pontuacao.NEU} / ${pontuacao["NEU-"]}</p>
+    `;
+  }
+</script>
     `;
   }
 </script>
