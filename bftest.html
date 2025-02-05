@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste de Personalidade</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #f9f9f9;
+    }
+    .frase {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .botoes button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .botoes button:nth-child(1) {
+      background-color: #4CAF50; /* Verde para "Concordo" */
+    }
+    .botoes button:nth-child(2) {
+      background-color: #F44336; /* Vermelho para "Discordo" */
+    }
+    .botoes button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .resultado-final {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="frase" id="frase">Carregando frase...</div>
+    <div class="botoes">
+      <button onclick="responder('concordo')">Concordo (+1)</button>
+      <button onclick="responder('discordo')">Discordo (-1)</button>
+    </div>
+    <div id="resultado"></div>
+    <div class="resultado-final" id="resultadoFinal"></div>
+  </div>
+
+  <script>
+    // Variáveis globais
+    let frases = [];
+    let indiceAtual = 0;
+    let pontuacao = { a: 0, b: 0, c: 0, d: 0, e: 0 };
+
+    // Carregar frases do arquivo JSON
+    fetch('frases.json')
+      .then(response => response.json())
+      .then(data => {
+        frases = data;
+        exibirFraseAtual();
+      })
+      .catch(error => console.error('Erro ao carregar frases:', error));
+
+    // Função para exibir a frase atual
+    function exibirFraseAtual() {
+      if (indiceAtual < frases.length) {
+        document.getElementById('frase').innerText = frases[indiceAtual].text;
+        document.getElementById('resultado').innerText = '';
+      } else {
+        mostrarResultadoFinal();
+      }
+    }
+
+    // Função para capturar a resposta do usuário
+    function responder(resposta) {
+      const fraseAtual = frases[indiceAtual];
+      if (resposta === 'concordo') {
+        pontuacao[fraseAtual.letter] += 1;
+      } else if (resposta === 'discordo') {
+        pontuacao[fraseAtual.letter] -= 1;
+      }
+
+      // Avançar para a próxima frase
+      indiceAtual++;
+      exibirFraseAtual();
+    }
+
+    // Função para mostrar o resultado final
+    function mostrarResultadoFinal() {
+      document.getElementById('frase').innerText = 'Fim do teste!';
+      document.getElementById('resultado').innerText = '';
+      document.getElementById('resultadoFinal').innerHTML = `
+        <h2>Resultado Final:</h2>
+        <p><strong>A:</strong> ${pontuacao.a}</p>
+        <p><strong>B:</strong> ${pontuacao.b}</p>
+        <p><strong>C:</strong> ${pontuacao.c}</p>
+        <p><strong>D:</strong> ${pontuacao.d}</p>
+        <p><strong>E:</strong> ${pontuacao.e}</p>
+      `;
+    }
+  </script>
+</body>
+</html>
