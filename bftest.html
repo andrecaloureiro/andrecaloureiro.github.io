@@ -66,11 +66,22 @@
     NEU: 0, "NEU-": 0
   };
 
-  // Carregar frases do arquivo JSON
+  // Função para usar Fischer yates Shuuffle no array
+  function embaralharArray(array) {
+    for ( let i = array.length -1; i >0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [array[i], array[j]] = [array[j], array[i]]; // troca de elementos
+    }
+  }
+
+
+
+  // Carregar frases do arquivo JSON + embaralhar
   fetch('frases.json')
     .then(response => response.json())
     .then(data => {
       frases = data;
+      embaralharArray(frases); // embaralha
       exibirFraseAtual();
     })
     .catch(error => console.error('Erro ao carregar frases:', error));
