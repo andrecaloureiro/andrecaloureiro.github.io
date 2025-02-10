@@ -85,37 +85,60 @@
       }
     });
 
-    playPauseBtn.addEventListener('click', () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
+    playPauseBtn.addEventListener('click', togglePlayPause);
+
+    increaseFontBtn.addEventListener('click', increaseFontSize);
+    decreaseFontBtn.addEventListener('click', decreaseFontSize);
+
+    increaseSpeedBtn.addEventListener('click', increaseSpeed);
+    decreaseSpeedBtn.addEventListener('click', decreaseSpeed);
+
+    document.addEventListener('keydown', (event) => {
+      if(event.code == 'Space') {
+        event.preventDefault();
+        togglePlayPause();
+      } 
+      else if(event.key == 'a') decreaseSpeed();
+      else if(event.key == 's') increaseSpeed();
+      else if(event.key == 'q') decreaseFontSize();
+      else if(event.key == 'w') increaseFontSize();
+    });
+
+
+
+    function togglePlayPause(){
+      if(intervalId){
+        clearInterval(intervalID);
+        intervalID = null;
         playPauseBtn.textContent = 'Play';
       } else {
         intervalId = setInterval(highlightNextWord, speed);
         playPauseBtn.textContent = 'Pausar';
+
       }
-    });
+    }
 
-    increaseFontBtn.addEventListener('click', () => {
+    function increaseFontSize(){
       fontSize += 2;
-      readingArea.style.fontSize = `${fontSize}px`;
-    });
+      readingArea.style.fontsize =`${fontSize}px`;
+    }
 
-    decreaseFontBtn.addEventListener('click', () => {
+
+    function decreaseFontSize() {
       if (fontSize > 8) {
         fontSize -= 2;
         readingArea.style.fontSize = `${fontSize}px`;
       }
-    });
+    }
 
-    increaseSpeedBtn.addEventListener('click', () => {
+    function increaseSpeedn() {
       if (speed > 50) {
         speed -= 50;
         resetInterval();
       }
-    });
+    }
 
-    decreaseSpeedBtn.addEventListener('click', () => {
+    function decreaseSpeed() {
       speed += 50;
       resetInterval();
     });
