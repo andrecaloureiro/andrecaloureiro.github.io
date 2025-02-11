@@ -7,9 +7,22 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
       padding: 0;
       background-color: #f4f4f9;
+      padding-top: 250px; /* Espaço suficiente para o cabeçalho fixo */
+      box-sizing: border-box;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      padding: 10px;
+      box-sizing: border-box;
     }
     textarea {
       width: 100%;
@@ -17,6 +30,7 @@
       margin-bottom: 10px;
       padding: 10px;
       font-size: 16px;
+      box-sizing: border-box;
     }
     button {
       margin: 5px;
@@ -25,7 +39,6 @@
       cursor: pointer;
     }
     #reading-area {
-      margin-top: 20px;
       font-size: 20px;
       line-height: 1.5;
       white-space: pre-wrap;
@@ -37,23 +50,25 @@
       background-color: yellow;
     }
     .controls {
-      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
   </style>
 </head>
 <body>
-  <h1>Shift Reading</h1>
-  <textarea id="text-input" placeholder="Cole seu texto aqui..."></textarea><br>
-  <button id="send-btn">Enviar</button>
-
-  <div class="controls" style="display: none;">
-    <button id="play-pause-btn">Play</button>
-    <button id="increase-font-btn">Aumentar Fonte</button>
-    <button id="decrease-font-btn">Diminuir Fonte</button>
-    <button id="increase-speed-btn">Aumentar Velocidade</button>
-    <button id="decrease-speed-btn">Diminuir Velocidade</button>
-  </div>
-
+  <header>
+    <h1 style="margin: 0;">Shift Reading</h1>
+    <textarea id="text-input" placeholder="Cole seu texto aqui..."></textarea><br>
+    <button id="send-btn">Enviar</button>
+    <div class="controls" style="display: none;">
+      <button id="play-pause-btn">Play</button>
+      <button id="increase-font-btn">Aumentar Fonte</button>
+      <button id="decrease-font-btn">Diminuir Fonte</button>
+      <button id="increase-speed-btn">Aumentar Velocidade</button>
+      <button id="decrease-speed-btn">Diminuir Velocidade</button>
+    </div>
+  </header>
   <div id="reading-area" style="display: none;"></div>
 
   <script>
@@ -81,15 +96,16 @@
         readingArea.innerHTML = words.map(word => `<span>${word}</span>`).join(' ');
         readingArea.style.display = 'block';
         controls.style.display = 'flex';
-        controls.style.gap = '10px';
+
+        // Ajusta o padding-top do body para evitar sobreposição
+        const headerHeight = document.querySelector('header').offsetHeight;
+        document.body.style.paddingTop = `${headerHeight + 20}px`; // Adiciona 20px de margem extra
       }
     });
 
     playPauseBtn.addEventListener('click', togglePlayPause);
-
     increaseFontBtn.addEventListener('click', increaseFontSize);
     decreaseFontBtn.addEventListener('click', decreaseFontSize);
-
     increaseSpeedBtn.addEventListener('click', increaseSpeed);
     decreaseSpeedBtn.addEventListener('click', decreaseSpeed);
 
@@ -104,8 +120,6 @@
       else if(event.key == 'w') increaseFontSize();
     });
 
-
-
     function togglePlayPause(){
       if(intervalId){
         clearInterval(intervalId);
@@ -114,7 +128,6 @@
       } else {
         intervalId = setInterval(highlightNextWord, speed);
         playPauseBtn.textContent = 'Pausar';
-
       }
     }
 
@@ -122,7 +135,6 @@
       fontSize += 2;
       readingArea.style.fontSize =`${fontSize}px`;
     }
-
 
     function decreaseFontSize() {
       if (fontSize > 8) {
@@ -151,9 +163,19 @@
         playPauseBtn.textContent = 'Play';
         return;
       }
+
+      // Remove o destaque da palavra anterior
       spans.forEach((span, index) => {
         span.classList.toggle('highlight', index === currentIndex);
       });
+
+      // Verifica se a palavra atual está fora da visão e rola a página
+      const currentSpan = spans[currentIndex];
+      const rect = currentSpan.getBoundingClientRect();
+      if (rect.bottom > window.innerHeight) {
+        window.scrollBy(0, window.innerHeight / 3); // Rola 1/3 da tela
+      }
+
       currentIndex++;
     }
 
