@@ -108,8 +108,8 @@
 
     function togglePlayPause(){
       if(intervalId){
-        clearInterval(intervalID);
-        intervalID = null;
+        clearInterval(intervalId);
+        intervalId = null;
         playPauseBtn.textContent = 'Play';
       } else {
         intervalId = setInterval(highlightNextWord, speed);
@@ -120,7 +120,7 @@
 
     function increaseFontSize(){
       fontSize += 2;
-      readingArea.style.fontsize =`${fontSize}px`;
+      readingArea.style.fontSize =`${fontSize}px`;
     }
 
 
@@ -141,7 +141,7 @@
     function decreaseSpeed() {
       speed += 50;
       resetInterval();
-    });
+    }
 
     function highlightNextWord() {
       const spans = readingArea.querySelectorAll('span');
