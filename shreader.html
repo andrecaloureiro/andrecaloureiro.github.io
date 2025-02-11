@@ -86,7 +86,7 @@
     let currentIndex = 0;
     let intervalId = null;
     let speed = 300; // Velocidade inicial em milissegundos
-    let fontSize = 20; // Tamanho inicial da fonte
+    let fontSize = 40; // Tamanho inicial da fonte
 
     sendBtn.addEventListener('click', () => {
       const text = textInput.value.trim();
@@ -173,7 +173,7 @@
       const currentSpan = spans[currentIndex];
       const rect = currentSpan.getBoundingClientRect();
       if (rect.bottom > window.innerHeight) {
-        window.scrollBy(0, window.innerHeight / 3); // Rola 1/3 da tela
+        window.scrollBy(0, window.innerHeight * 2 / 3); // Rola 2/3 da tela
       }
 
       currentIndex++;
