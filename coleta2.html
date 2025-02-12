@@ -2,18 +2,12 @@
 <html>
 <head>
     <title>Firebase Data List</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-</head>
-<body>
-    <h1>Firebase Data List</h1>
-    <ul id="dataList"></ul>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, get, push } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-    <input type="text" id="dataValue" placeholder="Enter value">
-    <button onClick="pushData()">Add data to Firebase</button>
-
-    <script>
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA7mkU5fxGQX0GZjZmVmqMBMqW41JOfNto",
             authDomain: "sqlbank-9b915.firebaseapp.com",
@@ -26,53 +20,86 @@
         };
 
         // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
-        function pushData(){
-            var data = document.getElementById("dataValue").value;
-            
-            if (data.trim() === "") {
-                alert("Por favor, insira um valor antes de adicionar.");
-                return;
-            }
+        // Função para buscar e listar dados do Firebase
+        async function fetchData() {
+            try {
+                const snapshot = await get(ref(database, '/')); // Referência à raiz do banco de dados
 
-            var dataRef = database.ref('pushData').push(); // Gera um novo ID
-            dataRef.set({
-                value: data
-            }).then(() => {
-                console.log("✅ Dado adicionado com sucesso!");
-                document.getElementById("dataValue").value = ""; // Limpar input
-            }).catch(error => {
-                console.error("❌ Erro ao adicionar dados: ", error);
-                alert("Erro ao adicionar dados. Verifique o console para mais detalhes.");
-            });
-        }
-
-        function fetchData() {
-            database.ref('pushData').on('value', (snapshot) => {
                 const dataList = document.getElementById("dataList");
                 dataList.innerHTML = "";
-                
+
                 if (!snapshot.exists()) {
                     console.warn("⚠️ Nenhum dado encontrado no Firebase.");
+                    alert("Nenhum dado encontrado no banco de dados.");
                     return;
                 }
 
                 snapshot.forEach((childSnapshot) => {
                     const li = document.createElement("li");
-                    li.textContent = childSnapshot.val().value;
+                    li.textContent = JSON.stringify(childSnapshot.val());
                     dataList.appendChild(li);
                 });
 
-                console.log("📡 Dados carregados do Firebase.");
-            }, (error) => {
+                console.log("📡 Todos os dados carregados do Firebase.");
+            } catch (error) {
                 console.error("❌ Erro ao buscar dados do Firebase:", error);
-            });
+                alert("Erro ao buscar dados. Verifique o console para mais detalhes.");
+            }
         }
 
-        // Fetch data on page load
-        fetchData();
+        // Função para adicionar dados ao Firebase
+        async function addData(event) {
+            event.preventDefault();
+
+            const nome = document.getElementById("nome").value.trim();
+            const email = document.getElementById("email").value.trim();
+
+            if (!nome || !email) {
+                alert("Por favor, preencha todos os campos.");
+                return;
+            }
+
+            try {
+                const dataRef = ref(database, '/'); // Referência à raiz do banco de dados
+                await push(dataRef, { nome, email }); // Adiciona os dados como um novo nó
+
+                alert("Dados adicionados com sucesso!");
+                document.getElementById("formData").reset(); // Limpa o formulário
+                fetchData(); // Atualiza a lista de dados
+            } catch (error) {
+                console.error("❌ Erro ao adicionar dados ao Firebase:", error);
+                alert("Erro ao adicionar dados. Verifique o console para mais detalhes.");
+            }
+        }
+
+        // Fetch all data on page load
+        window.onload = () => {
+            fetchData();
+            document.getElementById("formData").addEventListener("submit", addData);
+        };
     </script>
+</head>
+<body>
+    <h1>Firebase Data List</h1>
+
+    <!-- Formulário para adicionar dados -->
+    <form id="formData">
+        <label for="nome">Nome:</label><br>
+        <input type="text" id="nome" name="nome" required><br><br>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <button type="submit">Adicionar Dados</button>
+    </form>
+
+    <hr>
+
+    <!-- Lista de dados do Firebase -->
+    <h2>Dados no Firebase:</h2>
+    <ul id="dataList"></ul>
 </body>
 </html>
