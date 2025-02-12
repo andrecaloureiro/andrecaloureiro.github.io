@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demonstrações Práticas do React</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    header {
+      background: #61dafb;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .demo {
+      margin-bottom: 2rem;
+    }
+    .demo h2 {
+      margin-top: 0;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #333;
+      color: white;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Demonstrações Práticas do React</h1>
+  </header>
+
+  <div class="container">
+    <!-- Demonstração 1: Contador Simples -->
+    <div class="demo" id="contador-demo">
+      <h2>1. Contador Simples</h2>
+      <div id="contador"></div>
+      <pre>
+// Código do Contador
+function Contador() {
+  const [count, setCount] = React.useState(0);
+  return (
+    <div>
+      <h3>Contador: {count}</h3>
+      <button onClick={() => setCount(count + 1)}>Incrementar</button>
+      <button onClick={() => setCount(count - 1)}>Decrementar</button>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('contador')).render(<Contador />);
+      </pre>
+    </div>
+
+    <!-- Demonstração 2: Lista Dinâmica -->
+    <div class="demo" id="lista-demo">
+      <h2>2. Lista Dinâmica</h2>
+      <div id="lista"></div>
+      <pre>
+// Código da Lista Dinâmica
+function ListaDinamica() {
+  const [itens, setItens] = React.useState(["React", "Vue", "Angular"]);
+  const [novoItem, setNovoItem] = React.useState("");
+
+  const adicionarItem = () => {
+    if (novoItem.trim()) {
+      setItens([...itens, novoItem]);
+      setNovoItem("");
+    }
+  };
+
+  return (
+    <div>
+      <h3>Lista de Itens:</h3>
+      <ul>
+        {itens.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+      <input
+        type="text"
+        value={novoItem}
+        onChange={(e) => setNovoItem(e.target.value)}
+        placeholder="Adicionar item"
+      />
+      <button onClick={adicionarItem}>Adicionar</button>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('lista')).render(<ListaDinamica />);
+      </pre>
+    </div>
+
+    <!-- Demonstração 3: Relógio em Tempo Real -->
+    <div class="demo" id="relogio-demo">
+      <h2>3. Relógio em Tempo Real</h2>
+      <div id="relogio"></div>
+      <pre>
+// Código do Relógio
+function Relogio() {
+  const [hora, setHora] = React.useState(new Date().toLocaleTimeString());
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setHora(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <h3>Hora Atual: {hora}</h3>;
+}
+ReactDOM.createRoot(document.getElementById('relogio')).render(<Relogio />);
+      </pre>
+    </div>
+  </div>
+
+  <footer>
+    <p>Desenvolvido com ❤️ para demonstrar os potenciais do React</p>
+  </footer>
+
+  <!-- Scripts React via CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    // Renderização do Contador
+    function Contador() {
+      const [count, setCount] = React.useState(0);
+      return (
+        <div>
+          <h3>Contador: {count}</h3>
+          <button onClick={() => setCount(count + 1)}>Incrementar</button>
+          <button onClick={() => setCount(count - 1)}>Decrementar</button>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('contador')).render(<Contador />);
+
+    // Renderização da Lista Dinâmica
+    function ListaDinamica() {
+      const [itens, setItens] = React.useState(["React", "Vue", "Angular"]);
+      const [novoItem, setNovoItem] = React.useState("");
+
+      const adicionarItem = () => {
+        if (novoItem.trim()) {
+          setItens([...itens, novoItem]);
+          setNovoItem("");
+        }
+      };
+
+      return (
+        <div>
+          <h3>Lista de Itens:</h3>
+          <ul>
+            {itens.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+          <input
+            type="text"
+            value={novoItem}
+            onChange={(e) => setNovoItem(e.target.value)}
+            placeholder="Adicionar item"
+          />
+          <button onClick={adicionarItem}>Adicionar</button>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('lista')).render(<ListaDinamica />);
+
+    // Renderização do Relógio
+    function Relogio() {
+      const [hora, setHora] = React.useState(new Date().toLocaleTimeString());
+
+      React.useEffect(() => {
+        const interval = setInterval(() => {
+          setHora(new Date().toLocaleTimeString());
+        }, 1000);
+        return () => clearInterval(interval);
+      }, []);
+
+      return <h3>Hora Atual: {hora}</h3>;
+    }
+    ReactDOM.createRoot(document.getElementById('relogio')).render(<Relogio />);
+  </script>
+</body>
+</html>
