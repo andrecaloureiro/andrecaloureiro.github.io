@@ -2,27 +2,27 @@
 <html>
 <head>
     <title>Firebase Data List</title>
-    <script src="https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 </head>
 <body>
     <h1>Firebase Data List</h1>
     <ul id="dataList"></ul>
-    
+
     <input type="text" id="dataValue" placeholder="Enter value">
     <button onClick="pushData()">Add data to Firebase</button>
-    
+
     <script>
-        // Your Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
-          apiKey: "AIzaSyA7mkU5fxGQX0GZjZmVmqMBMqW41JOfNto",
-          authDomain: "sqlbank-9b915.firebaseapp.com",
-          databaseURL: "https://sqlbank-9b915-default-rtdb.firebaseio.com",
-          projectId: "sqlbank-9b915",
-          storageBucket: "sqlbank-9b915.firebasestorage.app",
-          messagingSenderId: "706638031015",
-          appId: "1:706638031015:web:3f4c815aebd93072b61382",
-          measurementId: "G-BXVGGWNBSM"
+            apiKey: "AIzaSyA7mkU5fxGQX0GZjZmVmqMBMqW41JOfNto",
+            authDomain: "sqlbank-9b915.firebaseapp.com",
+            databaseURL: "https://sqlbank-9b915-default-rtdb.firebaseio.com",
+            projectId: "sqlbank-9b915",
+            storageBucket: "sqlbank-9b915.firebasestorage.app",
+            messagingSenderId: "706638031015",
+            appId: "1:706638031015:web:3f4c815aebd93072b61382",
+            measurementId: "G-BXVGGWNBSM"
         };
 
         // Initialize Firebase
@@ -31,9 +31,21 @@
 
         function pushData(){
             var data = document.getElementById("dataValue").value;
-            var dataRef = database.ref('pushData').push(); // Generates a new child location
+            
+            if (data.trim() === "") {
+                alert("Por favor, insira um valor antes de adicionar.");
+                return;
+            }
+
+            var dataRef = database.ref('pushData').push(); // Gera um novo ID
             dataRef.set({
                 value: data
+            }).then(() => {
+                console.log("✅ Dado adicionado com sucesso!");
+                document.getElementById("dataValue").value = ""; // Limpar input
+            }).catch(error => {
+                console.error("❌ Erro ao adicionar dados: ", error);
+                alert("Erro ao adicionar dados. Verifique o console para mais detalhes.");
             });
         }
 
@@ -41,11 +53,21 @@
             database.ref('pushData').on('value', (snapshot) => {
                 const dataList = document.getElementById("dataList");
                 dataList.innerHTML = "";
+                
+                if (!snapshot.exists()) {
+                    console.warn("⚠️ Nenhum dado encontrado no Firebase.");
+                    return;
+                }
+
                 snapshot.forEach((childSnapshot) => {
                     const li = document.createElement("li");
                     li.textContent = childSnapshot.val().value;
                     dataList.appendChild(li);
                 });
+
+                console.log("📡 Dados carregados do Firebase.");
+            }, (error) => {
+                console.error("❌ Erro ao buscar dados do Firebase:", error);
             });
         }
 
