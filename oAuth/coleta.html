@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coleta de Dados</title>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "firebase/app";
+    import { getAnalytics } from "firebase/analytics";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+        apiKey: "AIzaSyA7mkU5fxGQX0GZjZmVmqMBMqW41JOfNto",
+        authDomain: "sqlbank-9b915.firebaseapp.com",
+        databaseURL: "https://sqlbank-9b915-default-rtdb.firebaseio.com",
+        projectId: "sqlbank-9b915",
+        storageBucket: "sqlbank-9b915.firebasestorage.app",
+        messagingSenderId: "706638031015",
+        appId: "1:706638031015:web:50928dd516c76322b61382",
+        measurementId: "G-7BEGWDXXGC"
+        };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // Credenciais do usuário específico para esta aplicação
+    //const usuarioEmail = "USUARIO_ESPECIFICO_EMAIL";
+    //const usuarioSenha = "USUARIO_ESPECIFICO_SENHA";
+
+    // Função para autenticar o usuário no Firebase
+    async function autenticarUsuario() {
+      try {
+        await signInWithEmailAndPassword(auth, usuarioEmail, usuarioSenha);
+        console.log("Usuário autenticado com sucesso.");
+      } catch (error) {
+        console.error("Erro ao autenticar o usuário:", error.message);
+        alert("Erro de autenticação. Por favor, contate o administrador.");
+      }
+    }
+
+    // Função para salvar os dados no Firebase Realtime Database
+    function salvarDados(event) {
+      event.preventDefault();
+
+      const nome = document.getElementById("nome").value;
+      const email = document.getElementById("email").value;
+      const telefone = document.getElementById("telefone").value;
+
+      if (!nome || !email || !telefone) {
+        alert("Por favor, preencha todos os campos.");
+        return;
+      }
+
+      const dados = {
+        nome: nome,
+        email: email,
+        telefone: telefone
+      };
+
+      const referencia = ref(database, 'usuarios/');
+      push(referencia, dados)
+        .then(() => {
+          alert("Dados salvos com sucesso!");
+          document.getElementById("formulario").reset();
+        })
+        .catch((error) => {
+          console.error("Erro ao salvar os dados: ", error);
+          alert("Ocorreu um erro ao salvar os dados.");
+        });
+    }
+
+    // Adiciona o evento de envio do formulário após a autenticação
+    window.onload = () => {
+      autenticarUsuario().then(() => {
+        document.getElementById("formulario").addEventListener("submit", salvarDados);
+      });
+    };
+  </script>
+</head>
+<body>
+  <h1>Formulário de Coleta de Dados</h1>
+  <form id="formulario">
+    <label for="nome">Nome:</label><br>
+    <input type="text" id="nome" name="nome" required><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <label for="telefone">Telefone:</label><br>
+    <input type="tel" id="telefone" name="telefone" required><br><br>
+
+    <button type="submit">Enviar</button>
+  </form>
+</body>
+</html>
