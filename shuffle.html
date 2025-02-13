@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fisher-Yates Shuffle Animation</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f9;
+  }
+  .container {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  .box {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #3498db;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: transform 0.5s ease, background-color 0.5s ease;
+  }
+  .box.swap {
+    background-color: #e74c3c;
+  }
+  .box.final {
+    background-color: #2ecc71;
+  }
+  .controls {
+    display: flex;
+    gap: 10px;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #2980b9;
+  }
+  button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+<div class="container" id="container"></div>
+<div class="controls">
+  <button id="restartButton">Reiniciar</button>
+  <button id="playPauseButton">Play</button>
+</div>
+
+<script>
+  const container = document.getElementById('container');
+  const restartButton = document.getElementById('restartButton');
+  const playPauseButton = document.getElementById('playPauseButton');
+  const boxes = [];
+  const totalBoxes = 10;
+  let isPlaying = false;
+  let shufflePromise = null;
+
+  // Create boxes
+  function createBoxes() {
+    container.innerHTML = '';
+    boxes.length = 0;
+    for (let i = 1; i <= totalBoxes; i++) {
+      const box = document.createElement('div');
+      box.className = 'box';
+      box.textContent = i;
+      container.appendChild(box);
+      boxes.push(box);
+    }
+  }
+
+  // Fisher-Yates Shuffle with animation
+  async function fisherYatesShuffle() {
+    let n = boxes.length;
+    while (n > 1 && isPlaying) {
+      const currentIndex = n - 1;
+      const randomIndex = Math.floor(Math.random() * n);
+
+      // Highlight the two boxes to be swapped
+      boxes[currentIndex].classList.add('swap');
+      boxes[randomIndex].classList.add('swap');
+
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for visualization
+
+      if (!isPlaying) return; // Pause check
+
+      // Swap elements in the DOM
+      container.insertBefore(boxes[randomIndex], boxes[currentIndex]);
+      
+      // Swap elements in the array
+      [boxes[currentIndex], boxes[randomIndex]] = [boxes[randomIndex], boxes[currentIndex]];
+
+      // Remove highlight after swap
+      boxes[currentIndex].classList.remove('swap');
+      boxes[randomIndex].classList.remove('swap');
+
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait before next step
+
+      if (!isPlaying) return; // Pause check
+
+      n--;
+    }
+
+    if (isPlaying) {
+      // Mark all boxes as final after shuffle
+      boxes.forEach(box => box.classList.add('final'));
+    }
+  }
+
+  // Toggle Play/Pause
+  function togglePlayPause() {
+    if (isPlaying) {
+      isPlaying = false;
+      playPauseButton.textContent = 'Play';
+    } else {
+      isPlaying = true;
+      playPauseButton.textContent = 'Pause';
+      if (!shufflePromise) {
+        shufflePromise = fisherYatesShuffle().finally(() => shufflePromise = null);
+      }
+    }
+  }
+
+  // Restart the shuffle
+  function restartShuffle() {
+    isPlaying = false;
+    playPauseButton.textContent = 'Play';
+    shufflePromise = null;
+    createBoxes();
+  }
+
+  // Event listeners
+  playPauseButton.addEventListener('click', togglePlayPause);
+  restartButton.addEventListener('click', restartShuffle);
+
+  // Initialize boxes
+  createBoxes();
+</script>
+</body>
+</html>
