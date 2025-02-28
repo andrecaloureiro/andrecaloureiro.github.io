@@ -15,10 +15,16 @@
             <button class="collapsible">Ex1</button>
             <div class="content">
                 <img src="./img/d1ex1.webp" alt="d1ex1">
-                <textarea id="d1ex1"></textarea>
-                <button class="collapsible">Historico</button>
+                <textarea id="d1ex1" placeholder="Insira o log aqui..."></textarea>
+                <button id="saveLogButton">Salvar Log</button>
+                <button id="loadHistoryButton">Carregar Histórico</button>
+
+                <!-- Seção de Histórico -->
+                <button class="collapsible">Histórico</button>
                 <div class="content">
-                    <p id="d1ex1">Registroa anteriores, com a tag #d1ex1</p>
+                    <div id="historyContainer">
+                        <p>Nenhum registro anterior disponível.</p>
+                    </div>
                 </div>
             </div>
 
