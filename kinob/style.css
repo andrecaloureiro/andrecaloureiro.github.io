@@ -17,9 +17,20 @@
 
 .content {
     display: none;
+    
     padding: 0 10px;
     overflow: hidden;
     background-color: #f9f9f9;
+
+    text-align: center;
+    justify-content: center;
+}
+
+.content img{
+    max-width: 100%;
+    height auto;
+/*    transform:scale(2);
+    transform-orgigin: center;*/ 
 }
 
 /* Estilização do carrossel */
@@ -63,3 +74,4 @@
 .carousel-button.next {
     right: 10px;
 }
+
