@@ -1,0 +1,30 @@
+        <!-- Outros dias seguem o mesmo padrão -->
+        <button class="collapsible">Segunda-feira</button>
+        <div class="content">
+            <button class="collapsible">Ex1</button>
+            <div class="content">
+                <img src="./img/d1ex1.webp" alt="d1ex1">
+            </div>
+
+                
+            <button class="collapsible">Ex1</button>
+            <div class="content">
+                <img src="./img/d1ex2.webp" alt="d1ex2">
+            </div>
+
+            <button class="collapsible">Ex3</button>
+            <div class="content">
+                <img src="./img/d1ex3.webp" alt="d1ex3">
+            </div>
+
+            <button class="collapsible">Ex4</button>
+            <div class="content">
+                <img src="./img/d1ex4.webp" alt="d1ex4">
+            </div>
+
+            <button class="collapsible">Ex5</button>
+            <div class="content">
+                <img src="./img/d1ex5.webp" alt="d1ex5">
+            </div>
+        </div>
+    </div>
