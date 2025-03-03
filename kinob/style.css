@@ -1,3 +1,30 @@
+/* estilicação de log button eload historico    */
+
+#saveLogButton, #loadHistoryButton {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#saveLogButton:hover, #loadHistoryButton:hover {
+    background-color: #0056b3;
+}
+
+#historyContainer {
+    margin-top: 10px;
+    text-align: left;
+}
+
+#historyContainer p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
 /* Estilização dos botões collapsibles */
 .collapsible {
     background-color: #f1f1f1;
