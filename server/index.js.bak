@@ -1,0 +1,60 @@
+import express from 'express';
+import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+
+const app = express();
+
+app.use(bodyParser.json());
+dotenv.config();
+
+const PORT = process.env.PORT || 5000;
+const MONGOURL = process.env.MONGO_URL;
+const dbName = 'default-atlas';
+
+
+const authMechanism = 'default';
+
+
+mongoose
+    .connect(MONGOURL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        dbName: dbName,
+        authMechanism: authMechanism
+    })
+    .then(() => {
+        console.log('MongoDB connected');
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+    });    
+}).catch((err) => console.log(err));
+
+
+/* 
+
+async function main() {
+  try {
+    // Use mongoose.connect to connect to the server
+    await mongoose.connect(url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      dbName: dbName, // Specify the database name here
+    });
+
+    console.log('Connected successfully to server');
+
+    // The following code can be used to perform database operations
+    // For example, define a schema and model here if needed
+
+    // Close the connection (optional, as Mongoose manages the connection pool)
+    // await mongoose.disconnect();
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+  }
+}
+ */
+/* main(); */
+
+
+    

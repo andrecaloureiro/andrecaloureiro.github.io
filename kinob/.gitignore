@@ -1,0 +1,13 @@
+# Ignorar todos os arquivos .log
+*.log
+
+# Ignorar a pasta build/
+build/
+node_modules/
+temp/
+server/
+
+# Ignorar todos os arquivos .tmp
+*.tmp
+db.js
+# Ignorar a pasta temp/ e todos os seus subdiretórios
