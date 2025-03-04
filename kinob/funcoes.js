@@ -1,3 +1,39 @@
+// função para acessar google sheets
+
+const URL_DO_WEB_APP='https://script.google.com/macros/s/AKfycbwmaU2Wf69_J8OGTZ6l8inxn2dCsm0CWsvgYmbghfgd2KyyyVgFa30j7TzID6XYUKjuTg/exec';
+
+async function enviarRegistro() {
+    const rotulo = document.getElementById("rotulo").value;
+    const log = document.getElementById("log").value;
+
+    const response = await fetch("URL_DO_WEB_APP", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rotulo, log }),
+    });
+
+    const result = await response.json();
+    if (result.status === "sucesso") {
+      alert("Registro salvo com sucesso!");
+    } else {
+      alert("Erro ao salvar o registro.");
+    }
+  }
+
+async function carregarHistorico() {
+  const response = await fetch("URL_DO_WEB_APP");
+  const historico = await response.json();
+
+  const lista = document.getElementById("historico-lista");
+  lista.innerHTML = ""; // Limpar a lista
+
+  historico.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.timestamp} - ${item.rotulo}: ${item.log}`;
+    lista.appendChild(li);
+  });
+}
+
 // Função para tornar os elementos collapsibles funcionais
 document.addEventListener("DOMContentLoaded", function () {
     const collapsibles = document.querySelectorAll(".collapsible");

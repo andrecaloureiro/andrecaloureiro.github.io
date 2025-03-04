@@ -15,15 +15,28 @@
             <button class="collapsible">Ex1</button>
             <div class="content">
                 <img src="./img/d1ex1.webp" alt="d1ex1">
-                <textarea id="d1ex1" placeholder="Insira o log aqui..."></textarea>
-                <button id="saveLogButton">Salvar Log</button>
+                <!-- <textarea id="d1ex1" placeholder="Insira o log aqui..."></textarea>
+                <button id="saveLogButton">Salvar Log</button> -->
+                <div id="registro-form">
+                    <h3>Registrar Log</h3>
+                    <label for="rotulo">Rótulo (ex.: d1ex1):</label>
+                    <input type="text" id="rotulo" placeholder="d1ex1"><br>
+                  
+                    <label for="log">Log:</label>
+                    <textarea id="log" placeholder="Descreva sua sessão"></textarea><br>
+                  
+                    <button onclick="enviarRegistro()">Enviar</button>
+                  </div>
+                  
+
                 <button id="loadHistoryButton">Carregar Histórico</button>
 
                 <!-- Seção de Histórico -->
                 <button class="collapsible">Histórico</button>
                 <div class="content">
                     <div id="historyContainer">
-                        <p>Nenhum registro anterior disponível.</p>
+                        <h3>Histórico</h3>
+                        <ul id="historico-lista"></ul>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,8 @@
 
-
+uso dos registros usando google sheets:
+https://script.google.com/macros/s/AKfycbwmaU2Wf69_J8OGTZ6l8inxn2dCsm0CWsvgYmbghfgd2KyyyVgFa30j7TzID6XYUKjuTg/exec
+sheet usada: kinob-registrar
+https://docs.google.com/spreadsheets/d/1rld2bjxSADeCLxmdsewXuO7Pxg43KabhLLkkYTUaHAU/edit?gid=0#gid=0
 
 backend 
 

@@ -12,3 +12,7 @@ app.listen( 3001, () => {
 });
 
 app.use('/api/user', route);
+
+app.get('/goHome', (req, res) => {
+    res.send('Welcome to the home page');
+});
