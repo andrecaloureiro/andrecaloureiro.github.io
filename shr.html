@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shift Reading</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      padding-top: 250px; /* Espaço suficiente para o cabeçalho fixo */
+      box-sizing: border-box;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #reading-area {
+      font-size: 20px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: #fff;
+    }
+    .highlight {
+      background-color: yellow;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .collapsible {
+      background-color: #f1f1f1;
+      color: black;
+      cursor: pointer;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 16px;
+    }
+    .collapsible:hover {
+      background-color: #ddd;
+    }
+    .content {
+      display: none;
+      padding: 10px;
+      overflow: hidden;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="margin: 0;">Shift Reading</h1>
+    <button class="collapsible">Cole seu texto aqui</button>
+    <div class="content">
+      <textarea id="text-input" placeholder="Cole seu texto aqui..."></textarea><br>
+      <button id="send-btn">Go!</button>
+    </div>
+    <div class="controls" style="display: none;">
+      <button id="play-pause-btn">Play</button>
+      <button id="increase-font-btn">+F</button>
+      <button id="decrease-font-btn">-F</button>
+      <button id="increase-speed-btn">+V</button>
+      <button id="decrease-speed-btn">-V</button>
+    </div>
+  </header>
+  <div id="reading-area" style="display: none;"></div>
+
+  <script>
+    const textInput = document.getElementById('text-input');
+    const sendBtn = document.getElementById('send-btn');
+    const readingArea = document.getElementById('reading-area');
+    const controls = document.querySelector('.controls');
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    const increaseFontBtn = document.getElementById('increase-font-btn');
+    const decreaseFontBtn = document.getElementById('decrease-font-btn');
+    const increaseSpeedBtn = document.getElementById('increase-speed-btn');
+    const decreaseSpeedBtn = document.getElementById('decrease-speed-btn');
+
+    let words = [];
+    let currentIndex = 0;
+    let intervalId = null;
+    let speed = 300; // Velocidade inicial em milissegundos
+    let fontSize = 40; // Tamanho inicial da fonte
+
+    sendBtn.addEventListener('click', () => {
+      const text = textInput.value.trim();
+      if (text) {
+        words = text.split(/\s+/);
+        currentIndex = 0;
+        readingArea.innerHTML = words.map(word => `<span>${word}</span>`).join(' ');
+        readingArea.style.display = 'block';
+        controls.style.display = 'flex';
+
+        // Ajusta o padding-top do body para evitar sobreposição
+        const headerHeight = document.querySelector('header').offsetHeight;
+        document.body.style.paddingTop = `${headerHeight + 20}px`; // Adiciona 20px de margem extra
+      }
+    });
+
+    playPauseBtn.addEventListener('click', togglePlayPause);
+    increaseFontBtn.addEventListener('click', increaseFontSize);
+    decreaseFontBtn.addEventListener('click', decreaseFontSize);
+    increaseSpeedBtn.addEventListener('click', increaseSpeed);
+    decreaseSpeedBtn.addEventListener('click', decreaseSpeed);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.code === 'Space') {
+        event.preventDefault();
+        togglePlayPause();
+      } else if (event.key === 'ArrowLeft') decreaseSpeed();
+      else if (event.key === 'ArrowRight') increaseSpeed();
+      else if (event.key === 'ArrowDown') decreaseFontSize();
+      else if (event.key === 'ArrowUp') increaseFontSize();
+    });
+
+    function togglePlayPause() {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+        playPauseBtn.textContent = 'Play';
+      } else {
+        intervalId = setInterval(highlightNextWord, speed);
+        playPauseBtn.textContent = 'Pause';
+      }
+    }
+
+    function increaseFontSize() {
+      fontSize += 2;
+      readingArea.style.fontSize = `${fontSize}px`;
+    }
+
+    function decreaseFontSize() {
+      if (fontSize > 8) {
+        fontSize -= 2;
+        readingArea.style.fontSize = `${fontSize}px`;
+      }
+    }
+
+    function increaseSpeed() {
+      if (speed > 50) {
+        speed -= 25;
+        resetInterval();
+      }
+    }
+
+    function decreaseSpeed() {
+      speed += 25;
+      resetInterval();
+    }
+
+    function highlightNextWord() {
+      const spans = readingArea.querySelectorAll('span');
+      if (currentIndex >= spans.length) {
+        clearInterval(intervalId);
+        intervalId = null;
+        playPauseBtn.textContent = 'Play';
+        return;
+      }
+
+      // Remove o destaque da palavra anterior
+      spans.forEach((span, index) => {
+        span.classList.toggle('highlight', index === currentIndex);
+      });
+
+      // Verifica se a palavra atual está fora da visão e rola a página
+      const currentSpan = spans[currentIndex];
+      const rect = currentSpan.getBoundingClientRect();
+      if (rect.bottom > window.innerHeight) {
+        window.scrollBy(0, window.innerHeight * 2 / 3); // Rola 2/3 da tela
+      }
+
+      currentIndex++;
+    }
+
+    function resetInterval() {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = setInterval(highlightNextWord, speed);
+      }
+    }
+
+    // Função para tornar os elementos collapsibles funcionais
+    const collapsibles = document.querySelectorAll(".collapsible");
+    collapsibles.forEach(collapsible => {
+      collapsible.addEventListener("click", function () {
+        this.classList.toggle("active");
+        const content = this.nextElementSibling;
+        content.style.display = content.style.display === "block" ? "none" : "block";
+
+        // Fecha outros collapsibles
+        Array.from(collapsible.parentNode.children).forEach(child => {
+          if (child !== this && child.classList.contains("collapsible")) {
+            child.classList.remove("active");
+            child.nextElementSibling.style.display = "none";
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
