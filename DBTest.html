@@ -62,9 +62,8 @@
           itemDiv.className = 'item';
           itemDiv.innerHTML = `
             <strong>ID:</strong> ${item._id}<br>
-            <strong>Nome:</strong> ${item.name}<br>
-            <strong>Descrição:</strong> ${item.description || 'N/A'}<br>
-            <strong>Criado em:</strong> ${new Date(item.createdAt).toLocaleString()}
+            <strong>texto:</strong> ${item.text}<br>
+            <strong>Numero:</strong> ${item.uniqueNumber || 'N/A'}<br>
           `;
           resultDiv.appendChild(itemDiv);
         });
