@@ -1,0 +1,80 @@
+<!--testando api do render + atlas-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste da Rota /data/read</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .item {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Teste da Rota /data/read</h1>
+  <p>Clique no botão abaixo para buscar os itens da coleção "items":</p>
+  <button id="fetchDataBtn">Buscar Itens</button>
+
+  <div id="result"></div>
+
+  <script>
+    // Função para buscar dados da API
+    async function fetchData() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '<p>Carregando...</p>';
+
+      try {
+        // Fazer a requisição GET para a rota /data/read
+        const response = await fetch('https://lms-backendv1.onrender.com/data/read');
+        
+        if (!response.ok) {
+          throw new Error(`Erro HTTP! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Limpar o conteúdo anterior
+        resultDiv.innerHTML = '';
+
+        // Verificar se há itens retornados
+        if (data.length === 0) {
+          resultDiv.innerHTML = '<p>Nenhum item encontrado.</p>';
+          return;
+        }
+
+        // Exibir os itens na página
+        data.forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'item';
+          itemDiv.innerHTML = `
+            <strong>ID:</strong> ${item._id}<br>
+            <strong>Nome:</strong> ${item.name}<br>
+            <strong>Descrição:</strong> ${item.description || 'N/A'}<br>
+            <strong>Criado em:</strong> ${new Date(item.createdAt).toLocaleString()}
+          `;
+          resultDiv.appendChild(itemDiv);
+        });
+      } catch (error) {
+        resultDiv.innerHTML = `<p class="error">Erro ao buscar dados: ${error.message}</p>`;
+      }
+    }
+
+    // Adicionar evento de clique ao botão
+    document.getElementById('fetchDataBtn').addEventListener('click', fetchData);
+  </script>
+</body>
+</html>
