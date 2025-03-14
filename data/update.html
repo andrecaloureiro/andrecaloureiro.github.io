@@ -1,0 +1,118 @@
+<!-- update.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atualizar Item</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      margin-top: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #ffc107;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #e0a800;
+    }
+    .error {
+      color: red;
+    }
+    .success {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>Atualizar Item</h1>
+  <form id="updateForm">
+    <label for="uniqueNumber">Número Único do Item:</label>
+    <input type="number" id="uniqueNumber" name="uniqueNumber" required>
+
+    <label for="text">Novo Texto:</label>
+    <input type="text" id="text" name="text">
+
+    <label for="newUniqueNumber">Novo Número Único (opcional):</label>
+    <input type="number" id="newUniqueNumber" name="newUniqueNumber">
+
+    <button type="submit">Atualizar Item</button>
+  </form>
+
+  <div id="message"></div>
+
+  <script type="module">
+    import BACKEND_URL from '../config.js';
+
+    // Função para atualizar um item
+    async function updateItem(event) {
+      event.preventDefault();
+
+      const messageDiv = document.getElementById('message');
+      messageDiv.innerHTML = '';
+
+      const uniqueNumber = parseInt(document.getElementById('uniqueNumber').value);
+      const text = document.getElementById('text').value.trim();
+      const newUniqueNumber = parseInt(document.getElementById('newUniqueNumber').value);
+
+      // Validar o uniqueNumber
+      if (!uniqueNumber || uniqueNumber <= 0) {
+        messageDiv.innerHTML = `<p class="error">O campo "Número Único do Item" é obrigatório e deve ser um número positivo.</p>`;
+        return;
+      }
+
+      // Construir o corpo da requisição apenas com os campos preenchidos
+      const requestBody = {};
+      if (text) requestBody.text = text;
+      if (newUniqueNumber) requestBody.newUniqueNumber = newUniqueNumber;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/data/update/${uniqueNumber}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Erro HTTP! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        messageDiv.innerHTML = `<p class="success">Item atualizado com sucesso!</p>`;
+        document.getElementById('updateForm').reset();
+      } catch (error) {
+        messageDiv.innerHTML = `<p class="error">Erro ao atualizar item: ${error.message}</p>`;
+      }
+    }
+
+    // Adicionar evento de envio ao formulário
+    document.getElementById('updateForm').addEventListener('submit', updateItem);
+  </script>
+</body>
+</html>

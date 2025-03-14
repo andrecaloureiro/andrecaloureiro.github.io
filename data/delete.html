@@ -1,0 +1,94 @@
+<!-- delete.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deletar Item</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      margin-top: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #c82333;
+    }
+    .error {
+      color: red;
+    }
+    .success {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>Deletar Item</h1>
+  <form id="deleteForm">
+    <label for="id">ID do Item:</label>
+    <input type="text" id="id" name="id" required>
+
+    <button type="submit">Deletar Item</button>
+  </form>
+
+  <div id="message"></div>
+
+  <script type="module">
+    import BACKEND_URL from '../config.js';
+
+    // Função para deletar um item
+    async function deleteItem(event) {
+      event.preventDefault();
+
+      const messageDiv = document.getElementById('message');
+      messageDiv.innerHTML = '';
+
+      const id = document.getElementById('id').value;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/data/delete/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erro HTTP! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        messageDiv.innerHTML = `<p class="success">${data.message}</p>`;
+        document.getElementById('deleteForm').reset();
+      } catch (error) {
+        messageDiv.innerHTML = `<p class="error">Erro ao deletar item: ${error.message}</p>`;
+      }
+    }
+
+    // Adicionar evento de envio ao formulário
+    document.getElementById('deleteForm').addEventListener('submit', deleteItem);
+  </script>
+</body>
+</html>
