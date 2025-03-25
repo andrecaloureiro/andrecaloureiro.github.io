@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autenticação Firebase</title>
+  <!-- Importando o Firebase -->
+  <script type="module">
+    // Importe os SDKs necessários do Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // Configuração do Firebase (substitua pelos seus dados)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDrfy_WP7j3KXTXbt0V1wUaaHErSK500j0",
+        authDomain: "authentication-f9bbc.firebaseapp.com",
+        projectId: "authentication-f9bbc",
+        storageBucket: "authentication-f9bbc.firebasestorage.app",
+        messagingSenderId: "558300670017",
+        appId: "1:558300670017:web:412ae33f1de6fe4eb5fec0"
+};
+
+    // Inicialize o Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Função para registrar um novo usuário
+    window.registerUser = function () {
+      const email = document.getElementById("register-email").value;
+      const password = document.getElementById("register-password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Usuário registrado com sucesso!");
+        })
+        .catch((error) => {
+          alert("Erro ao registrar: " + error.message);
+        });
+    };
+
+    // Função para fazer login
+    window.loginUser = function () {
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Login realizado com sucesso!");
+        })
+        .catch((error) => {
+          alert("Erro ao fazer login: " + error.message);
+        });
+    };
+
+    // Função para fazer logout
+    window.logoutUser = function () {
+      signOut(auth)
+        .then(() => {
+          alert("Logout realizado com sucesso!");
+        })
+        .catch((error) => {
+          alert("Erro ao fazer logout: " + error.message);
+        });
+    };
+
+    // Monitora o estado de autenticação
+    onAuthStateChanged(auth, (user) => {
+      const userStatus = document.getElementById("user-status");
+      if (user) {
+        userStatus.innerHTML = `Usuário logado: ${user.email}`;
+      } else {
+        userStatus.innerHTML = "Nenhum usuário logado.";
+      }
+    });
+  </script>
+</head>
+<body>
+  <h1>Autenticação com Firebase</h1>
+
+  <div id="auth-container">
+    <h2>Registrar</h2>
+    <input type="email" id="register-email" placeholder="Email" required />
+    <input type="password" id="register-password" placeholder="Senha" required />
+    <button onclick="registerUser()">Registrar</button>
+
+    <h2>Login</h2>
+    <input type="email" id="login-email" placeholder="Email" required />
+    <input type="password" id="login-password" placeholder="Senha" required />
+    <button onclick="loginUser()">Entrar</button>
+
+    <h2>Logout</h2>
+    <button onclick="logoutUser()">Sair</button>
+
+    <p id="user-status">Verificando status...</p>
+  </div>
+</body>
+</html>
