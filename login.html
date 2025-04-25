@@ -21,8 +21,13 @@
 };
 
     // Inicialize o Firebase
+    console.log("Inicializando Firebase...");
     const app = initializeApp(firebaseConfig);
+    console.log("Firebase inicializado:", app);
+
+    console.log("Carregando módulo de autenticação...");
     const auth = getAuth(app);
+    console.log("Módulo de autenticação carregado:", auth);
 
     // Função para registrar um novo usuário
     window.registerUser = function () {
