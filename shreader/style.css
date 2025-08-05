@@ -1,0 +1,176 @@
+/* --- Estilos Gerais e Responsividade --- */
+:root {
+  --primary-color: #1877f2;
+  --background-color: #f0f2f5;
+  --container-background: #ffffff;
+  --text-color: #1c1e21;
+  --border-color: #dddfe2;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  margin: 0;
+  padding: 80px 10px 20px 10px; /* Adiciona padding no topo para o menu sticky */
+}
+
+.main-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  background: var(--container-background);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+  color: #333;
+  border-bottom: 2px solid #e9ebee;
+  padding-bottom: 10px;
+}
+
+/* --- Controles Sticky e Colapsáveis --- */
+.sticky-controls-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
+  padding: 10px;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+#toggle-controls-btn {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+#controls-panel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  overflow: hidden;
+  max-height: 200px; /* Altura suficiente para os botões */
+  transition: max-height 0.4s ease-in-out, padding 0.4s ease;
+  padding: 10px 0 0 0;
+}
+
+#controls-panel.collapsed {
+  max-height: 0;
+  padding: 0;
+}
+
+/* --- Estilos dos Componentes --- */
+textarea {
+  width: 100%;
+  height: 150px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: #e4e6eb;
+  font-weight: bold;
+  color: #4b4f56;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+button:hover {
+  background-color: #d8dade;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+#go-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  width: 100%;
+}
+
+/* --- Área de Leitura --- */
+#reader-content-wrapper {
+  height: 50vh; /* Usa a altura da viewport para ser mais adaptável */
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  padding: 15px;
+  border-radius: 6px;
+}
+
+#reader-content {
+  font-size: 22px;
+  text-align: justify;
+}
+
+.highlight {
+  background-color: #fff352;
+  padding: 2px 0;
+  border-radius: 3px;
+}
+
+/* --- Seção ePub --- */
+#epub-toc ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#epub-toc li a {
+  display: block;
+  padding: 8px;
+  text-decoration: none;
+  color: var(--primary-color);
+  border-radius: 4px;
+}
+
+#epub-toc li a:hover {
+  background-color: #f0f2f5;
+}
+
+#loading-indicator {
+  padding: 10px;
+  font-weight: bold;
+  color: #555;
+}
+
+.hidden {
+  display: none;
+}
+
+/* --- Media Query para Telas Pequenas (Mobile) --- */
+@media (max-width: 600px) {
+  body {
+      padding: 80px 5px 10px 5px;
+  }
+  .main-container {
+      padding: 10px;
+  }
+  h1 {
+      font-size: 1.8em;
+  }
+  #reader-content-wrapper {
+      height: 45vh;
+  }
+  button {
+      padding: 8px 12px;
+      font-size: 14px;
+  }
+}

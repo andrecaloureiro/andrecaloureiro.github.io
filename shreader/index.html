@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Reading</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="sticky-controls-container">
+        <button id="toggle-controls-btn">Controles ☰</button>
+        <div id="controls-panel" class="collapsed">
+            <button id="play-pause-btn">Play</button>
+            <button id="increase-font-btn">+F</button>
+            <button id="decrease-font-btn">-F</button>
+            <button id="increase-speed-btn">+V</button>
+            <button id="decrease-speed-btn">-V</button>
+            <button id="increase-scroll-btn">+R</button>
+            <button id="decrease-scroll-btn">-R</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <h1>Shift Reading</h1>
+
+        <div class="input-section">
+            <textarea id="text-input" placeholder="Cole seu texto aqui ou carregue um arquivo ePub abaixo..."></textarea>
+            <button id="go-btn">Carregar Texto</button>
+        </div>
+
+        <div id="reader-content-wrapper">
+            <div id="reader-content"></div>
+        </div>
+
+        <div class="epub-section">
+            <h2>Carregar ePub</h2>
+            <input type="file" id="epub-file" accept=".epub">
+            <div id="epub-toc-title"></div>
+            <div id="epub-toc"></div>
+        </div>
+    </div>
+
+    <!-- Bibliotecas necessárias -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/epub.js/0.3.93/epub.min.js"></script>
+    
+    <!-- Nosso script -->
+    <script src="script.js"></script>
+</body>
+</html>
