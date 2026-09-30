@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Leitor EPUB & PDF com Auto-Scroll por Linha</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts para Leitura Confortável -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- JSZip (necessário para EPUB.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <!-- EPUB.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+
+  <!-- PDF.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    // Configura o worker do PDF.js
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-color: #faf9f6;
+      --text-color: #242424;
+      --panel-bg: #ffffff;
+      --panel-border: #e2e8f0;
+      --accent: #2563eb;
+      --reading-line-height: 1.8;
+    }
+
+    body[data-theme="dark"] {
+      --bg-color: #121212;
+      --text-color: #e2e8f0;
+      --panel-bg: #1e1e1e;
+      --panel-border: #2d3748;
+      --accent: #3b82f6;
+    }
+
+    body[data-theme="sepia"] {
+      --bg-color: #f4ecd8;
+      --text-color: #5b4636;
+      --panel-bg: #ede3cc;
+      --panel-border: #ded2b5;
+      --accent: #b45309;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      touch-action: pan-y;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .book-content {
+      font-family: 'Merriweather', Georgia, serif;
+      line-height: var(--reading-line-height);
+      text-align: justify;
+      hyphens: auto;
+      word-break: break-word;
+      text-justify: inter-word;
+    }
+
+    .book-content p {
+      margin-bottom: 1.35em;
+      text-indent: 1.8em;
+    }
+
+    .book-content h1, .book-content h2, .book-content h3 {
+      font-family: 'Inter', sans-serif;
+      text-align: left;
+      font-weight: 700;
+      margin-top: 1.8em;
+      margin-bottom: 0.8em;
+      text-indent: 0;
+      line-height: 1.3;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(150, 150, 150, 0.4);
+      border-radius: 4px;
+    }
+
+    /* Sidebar slide effect */
+    .toc-drawer {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+    }
+
+    /* Floating indicator */
+    .reading-glow {
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+<body data-theme="sepia" class="min-h-screen flex flex-col relative select-none md:select-text">
+
+  <header class="fixed top-0 left-0 right-0 z-40 shadow-sm border-b backdrop-blur-md transition-colors" 
+          style="background-color: var(--panel-bg); border-color: var(--panel-border);">
+    <div class="max-w-7xl mx-auto px-3 py-2 flex flex-wrap items-center justify-between gap-2">
+      
+      <!-- Lado Esquerdo: Sumário & Upload -->
+      <div class="flex items-center space-x-2">
+        <button id="btn-toggle-toc" class="p-2.5 rounded-lg border flex items-center gap-1.5 text-xs sm:text-sm font-medium transition active:scale-95"
+                style="border-color: var(--panel-border);" title="Alternar Sumário">
+          <i class="fa-solid fa-list-ul"></i>
+          <span class="hidden sm:inline">Sumário</span>
+        </button>
+
+        <label class="cursor-pointer p-2.5 rounded-lg border flex items-center gap-1.5 text-xs sm:text-sm font-medium transition active:scale-95 bg-blue-600 text-white hover:bg-blue-700" 
+               title="Carregar Arquivo EPUB ou PDF">
+          <i class="fa-solid fa-file-arrow-up"></i>
+          <span class="hidden md:inline">Abrir Livro</span>
+          <input type="file" id="file-input" accept=".epub, .pdf" class="hidden">
+        </label>
+        
+        <span id="current-doc-title" class="text-xs font-semibold truncate max-w-[120px] sm:max-w-[200px] opacity-75 hidden xs:inline-block">
+          Nenhum arquivo
+        </span>
+      </div>
+
+      <!-- Centro: Controle de Auto-Scroll Principal -->
+      <div class="flex items-center space-x-2">
+        <button id="btn-play-scroll" class="px-4 py-2 rounded-full font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white">
+          <i id="play-icon" class="fa-solid fa-play"></i>
+          <span id="play-text">Iniciar</span>
+        </button>
+      </div>
+
+      <!-- Lado Direito: Ajustes de Fonte, Velocidade, Linhas e Tema -->
+      <div class="flex items-center space-x-1 sm:space-x-2">
+        
+        <!-- Fonte: Menor e Maior -->
+        <div class="flex items-center rounded-lg border overflow-hidden" style="border-color: var(--panel-border);">
+          <button id="btn-font-dec" class="px-2.5 py-1.5 text-xs sm:text-sm hover:bg-black/5 dark:hover:bg-white/5 active:scale-95" title="Diminuir Fonte">
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <span id="font-size-label" class="px-2 text-xs font-bold font-mono">18</span>
+          <button id="btn-font-inc" class="px-2.5 py-1.5 text-xs sm:text-sm hover:bg-black/5 dark:hover:bg-white/5 active:scale-95" title="Aumentar Fonte">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+
+        <!-- Botão para abrir painel móvel de velocidade/steps -->
+        <button id="btn-speed-panel" class="p-2 sm:px-3 sm:py-1.5 rounded-lg border text-xs sm:text-sm flex items-center gap-1.5"
+                style="border-color: var(--panel-border);" title="Configurar Velocidade e Passos">
+          <i class="fa-solid fa-gauge-high text-blue-500"></i>
+          <span class="hidden lg:inline">Ajustes Scroll</span>
+        </button>
+
+        <!-- Seletor de Tema -->
+        <div class="flex items-center rounded-lg border p-0.5" style="border-color: var(--panel-border);">
+          <button data-set-theme="sepia" class="w-6 h-6 rounded-md bg-[#f4ecd8] border border-[#ded2b5] mx-0.5" title="Tema Sépia"></button>
+          <button data-set-theme="light" class="w-6 h-6 rounded-md bg-[#ffffff] border border-gray-300 mx-0.5" title="Tema Claro"></button>
+          <button data-set-theme="dark" class="w-6 h-6 rounded-md bg-[#121212] border border-gray-700 mx-0.5" title="Tema Escuro"></button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Barra expansível de controles de rolagem (Velocidade & Linhas por Step) -->
+    <div id="scroll-settings-bar" class="hidden border-t px-4 py-2.5 text-xs flex flex-wrap items-center justify-center gap-4 transition-all"
+         style="background-color: var(--panel-bg); border-color: var(--panel-border);">
+      
+      <!-- Linhas por Step -->
+      <div class="flex items-center gap-2">
+        <label class="font-medium opacity-80">Linhas / Step:</label>
+        <div class="inline-flex rounded-md shadow-sm" role="group">
+          <button type="button" data-lines="1" class="step-line-btn px-2.5 py-1 rounded-l-md border font-semibold bg-blue-600 text-white border-blue-600">1</button>
+          <button type="button" data-lines="2" class="step-line-btn px-2.5 py-1 border font-semibold border-gray-300">2</button>
+          <button type="button" data-lines="3" class="step-line-btn px-2.5 py-1 rounded-r-md border font-semibold border-gray-300">3</button>
+        </div>
+      </div>
+
+      <!-- Velocidade em Segundos / Intervalo -->
+      <div class="flex items-center gap-2">
+        <label class="font-medium opacity-80">Intervalo:</label>
+        <input type="range" id="scroll-speed-slider" min="0.4" max="4.0" step="0.1" value="1.2" class="w-28 sm:w-36 accent-blue-600 cursor-pointer">
+        <span id="speed-value-label" class="font-mono font-bold w-12 text-center">1.2s</span>
+      </div>
+
+      <!-- Status do Step calculado -->
+      <div class="text-[11px] opacity-70 italic hidden sm:block">
+        1 Step = <span id="calculated-step-px">32</span>px (1 linha)
+      </div>
+    </div>
+  </header>
+
+  <!-- Gaveta Lateral / Menu do Sumário -->
+  <aside id="toc-drawer" class="toc-drawer fixed top-[54px] sm:top-[60px] left-0 bottom-0 w-full sm:w-80 md:w-96 z-30 shadow-2xl border-r transform -translate-x-full overflow-hidden flex flex-col"
+         style="background-color: var(--panel-bg); border-color: var(--panel-border);">
+    <div class="p-3 border-b flex items-center justify-between font-bold" style="border-color: var(--panel-border);">
+      <span class="flex items-center gap-2">
+        <i class="fa-solid fa-book-open text-blue-500"></i> Sumário / Capítulos
+      </span>
+      <button id="btn-close-toc" class="p-1.5 rounded-md hover:bg-black/10 dark:hover:bg-white/10" aria-label="Fechar Sumário">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div id="toc-list" class="flex-1 overflow-y-auto p-2 space-y-1 text-sm">
+      <div class="p-4 text-center opacity-60 text-xs italic">
+        Nenhum arquivo carregado. Abra um arquivo PDF ou EPUB para visualizar os capítulos.
+      </div>
+    </div>
+  </aside>
+
+  <!-- Overlay para telas móveis ao abrir o sumário -->
+  <div id="toc-backdrop" class="fixed inset-0 bg-black/40 z-20 hidden backdrop-blur-[2px]"></div>
+
+  <main class="flex-1 w-full pt-[72px] pb-24 px-4 sm:px-6 flex flex-col items-center">
+    
+    <!-- Tela de Boas-Vindas / Instruções (se nenhum livro estiver aberto) -->
+    <div id="empty-state" class="w-full max-w-xl mx-auto my-auto py-12 text-center flex flex-col items-center justify-center">
+      <div class="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-inner text-3xl"
+           style="background-color: var(--panel-bg); color: var(--accent);">
+        <i class="fa-solid fa-book-bookmark"></i>
+      </div>
+      <h2 class="text-2xl font-bold mb-3 tracking-tight">Leitor com Auto-Scroll por Linha</h2>
+      <p class="text-sm opacity-80 mb-6 max-w-md">
+        Carregue um arquivo <strong>EPUB</strong> ou <strong>PDF</strong> do seu celular ou computador. O texto será extraído, formatado e centralizado para leitura com rolagem automática precisa.
+      </p>
+      
+      <label class="cursor-pointer px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center gap-3 shadow-lg active:scale-95 transition">
+        <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+        <span>Escolher EPUB ou PDF</span>
+        <input type="file" id="file-input-welcome" accept=".epub, .pdf" class="hidden">
+      </label>
+
+      <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left w-full text-xs">
+        <div class="p-3 rounded-lg border" style="border-color: var(--panel-border); background-color: var(--panel-bg);">
+          <strong class="block mb-1 font-semibold"><i class="fa-solid fa-arrows-up-down text-blue-500"></i> Auto-Scroll em Linhas</strong>
+          Cada step rola exatamente a altura de 1 linha de texto renderizada.
+        </div>
+        <div class="p-3 rounded-lg border" style="border-color: var(--panel-border); background-color: var(--panel-bg);">
+          <strong class="block mb-1 font-semibold"><i class="fa-solid fa-mobile-screen text-blue-500"></i> Totalmente Touch</strong>
+          Otimizado para celulares verticais com controles fixos e sumário colapsável.
+        </div>
+        <div class="p-3 rounded-lg border" style="border-color: var(--panel-border); background-color: var(--panel-bg);">
+          <strong class="block mb-1 font-semibold"><i class="fa-solid fa-palette text-blue-500"></i> Temas & Tipografia</strong>
+          Modo Sépie, Escuro e Claro com texto perfeitamente justificado.
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicador de Carregamento -->
+    <div id="loading-spinner" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center text-white">
+      <div class="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin mb-3"></div>
+      <p id="loading-message" class="text-sm font-medium tracking-wide">Processando livro...</p>
+    </div>
+
+    <!-- Contêiner do Livro (Texto Justificado e Centralizado) -->
+    <article id="reader-container" class="book-content w-full max-w-2xl sm:max-w-3xl mx-auto hidden pb-32">
+      <!-- O conteúdo do livro será injetado dinamicamente aqui -->
+    </article>
+
+  </main>
+
+  <div id="mobile-floating-controls" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30 flex items-center gap-3 px-4 py-2 rounded-full shadow-2xl backdrop-blur-md border reading-glow"
+       style="background-color: var(--panel-bg); border-color: var(--panel-border);">
+    <button id="float-play-btn" class="w-10 h-10 rounded-full flex items-center justify-center bg-blue-600 text-white shadow-md active:scale-90 transition">
+      <i id="float-play-icon" class="fa-solid fa-play"></i>
+    </button>
+    <div class="h-6 w-px bg-gray-300 dark:bg-gray-700"></div>
+    <button id="btn-scroll-step-back" class="p-2 text-sm opacity-80 hover:opacity-100 active:scale-95" title="Voltar 1 Step">
+      <i class="fa-solid fa-backward-step"></i>
+    </button>
+    <button id="btn-scroll-step-forward" class="p-2 text-sm opacity-80 hover:opacity-100 active:scale-95" title="Avançar 1 Step">
+      <i class="fa-solid fa-forward-step"></i>
+    </button>
+    <div class="h-6 w-px bg-gray-300 dark:bg-gray-700"></div>
+    <span id="float-scroll-status" class="text-[11px] font-mono uppercase tracking-wider font-semibold opacity-70">Pausado</span>
+  </div>
+
+  <!-- Mensagem Toast de Notificação -->
+  <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg bg-gray-900 text-white text-xs shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+    Aviso
+  </div>
+
+  <script>
+    // --- ESTADO GLOBAL DA APLICAÇÃO ---
+    const state = {
+      fontSize: 18,               // pixels
+      lineMultiplier: 1.8,        // line-height em relação à fonte
+      linesPerStep: 1,            // 1, 2 ou 3 linhas por rolagem
+      speedSeconds: 1.2,          // segundos por step
+      isScrolling: false,         // estado do auto-scroll
+      scrollTimer: null,          // timer id
+      loadedBookType: null,       // 'epub' ou 'pdf'
+      currentBookTitle: '',
+      tocItems: []                // Lista do Sumário: [{label, targetId}]
+    };
+
+    // Elementos DOM
+    const readerContainer = document.getElementById('reader-container');
+    const emptyState = document.getElementById('empty-state');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const loadingMessage = document.getElementById('loading-message');
+    const btnPlayScroll = document.getElementById('btn-play-scroll');
+    const playIcon = document.getElementById('play-icon');
+    const playText = document.getElementById('play-text');
+    const floatPlayBtn = document.getElementById('float-play-btn');
+    const floatPlayIcon = document.getElementById('float-play-icon');
+    const floatScrollStatus = document.getElementById('float-scroll-status');
+    const fontSizeLabel = document.getElementById('font-size-label');
+    const calculatedStepPx = document.getElementById('calculated-step-px');
+    const speedSlider = document.getElementById('scroll-speed-slider');
+    const speedValueLabel = document.getElementById('speed-value-label');
+    const tocDrawer = document.getElementById('toc-drawer');
+    const tocBackdrop = document.getElementById('toc-backdrop');
+    const tocList = document.getElementById('toc-list');
+    const currentDocTitle = document.getElementById('current-doc-title');
+    const scrollSettingsBar = document.getElementById('scroll-settings-bar');
+    const toast = document.getElementById('toast');
+
+    function showToast(msg, duration = 2500) {
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, duration);
+    }
+
+    function showLoading(msg = 'Carregando arquivo...') {
+      loadingMessage.textContent = msg;
+      loadingSpinner.classList.remove('hidden');
+    }
+
+    function hideLoading() {
+      loadingSpinner.classList.add('hidden');
+    }
+
+    // Calcula a altura exata em pixels de 1 linha de texto na área de leitura
+    function getLineHeightInPixels() {
+      return state.fontSize * state.lineMultiplier;
+    }
+
+    function updateStepIndicator() {
+      const stepPx = Math.round(getLineHeightInPixels() * state.linesPerStep);
+      calculatedStepPx.textContent = `${stepPx}`;
+    }
+
+    function applyFontSize() {
+      readerContainer.style.fontSize = `${state.fontSize}px`;
+      document.documentElement.style.setProperty('--reading-line-height', state.lineMultiplier);
+      fontSizeLabel.textContent = `${state.fontSize}`;
+      updateStepIndicator();
+    }
+
+    function executeScrollStep() {
+      if (!state.isScrolling) return;
+
+      const lineHeightPx = getLineHeightInPixels();
+      const distance = lineHeightPx * state.linesPerStep;
+
+      // Executa o scroll da janela
+      window.scrollBy({
+        top: distance,
+        behavior: 'smooth'
+      });
+
+      // Se atingir o fim da página, encerra o auto-scroll
+      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 5)) {
+        stopAutoScroll();
+        showToast('Fim do documento alcançado');
+      }
+    }
+
+    function startAutoScroll() {
+      if (state.isScrolling) return;
+      if (readerContainer.classList.contains('hidden') || !readerContainer.innerText.trim()) {
+        showToast('Abra um livro primeiro!');
+        return;
+      }
+
+      state.isScrolling = true;
+      updatePlayControlsUI(true);
+
+      // Inicia com um step imediato e agenda os próximos
+      executeScrollStep();
+      const intervalMs = state.speedSeconds * 1000;
+      state.scrollTimer = setInterval(executeScrollStep, intervalMs);
+    }
+
+    function stopAutoScroll() {
+      if (!state.isScrolling && !state.scrollTimer) return;
+      state.isScrolling = false;
+      if (state.scrollTimer) {
+        clearInterval(state.scrollTimer);
+        state.scrollTimer = null;
+      }
+      updatePlayControlsUI(false);
+    }
+
+    function toggleAutoScroll() {
+      if (state.isScrolling) {
+        stopAutoScroll();
+      } else {
+        startAutoScroll();
+      }
+    }
+
+    function resetAutoScrollInterval() {
+      if (state.isScrolling) {
+        clearInterval(state.scrollTimer);
+        const intervalMs = state.speedSeconds * 1000;
+        state.scrollTimer = setInterval(executeScrollStep, intervalMs);
+      }
+    }
+
+    function updatePlayControlsUI(isPlaying) {
+      if (isPlaying) {
+        btnPlayScroll.classList.replace('bg-emerald-600', 'bg-amber-600');
+        btnPlayScroll.classList.replace('hover:bg-emerald-700', 'hover:bg-amber-700');
+        playIcon.className = 'fa-solid fa-pause';
+        playText.textContent = 'Pausar';
+
+        floatPlayBtn.classList.replace('bg-blue-600', 'bg-amber-600');
+        floatPlayIcon.className = 'fa-solid fa-pause';
+        floatScrollStatus.textContent = 'Rolando...';
+        floatScrollStatus.classList.add('text-emerald-500');
+      } else {
+        btnPlayScroll.classList.replace('bg-amber-600', 'bg-emerald-600');
+        btnPlayScroll.classList.replace('hover:bg-amber-700', 'hover:bg-emerald-700');
+        playIcon.className = 'fa-solid fa-play';
+        playText.textContent = 'Iniciar';
+
+        floatPlayBtn.classList.replace('bg-amber-600', 'bg-blue-600');
+        floatPlayIcon.className = 'fa-solid fa-play';
+        floatScrollStatus.textContent = 'Pausado';
+        floatScrollStatus.classList.remove('text-emerald-500');
+      }
+    }
+
+    async function loadEpubFile(file) {
+      showLoading('Extraindo e formatando EPUB...');
+      readerContainer.innerHTML = '';
+      state.tocItems = [];
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const book = ePub(arrayBuffer);
+        await book.ready;
+
+        state.currentBookTitle = (book.package && book.package.metadata && book.package.metadata.title) ? book.package.metadata.title : file.name;
+        currentDocTitle.textContent = state.currentBookTitle;
+        currentDocTitle.title = state.currentBookTitle;
+
+        // Extrai o TOC oficial se existir
+        const navigation = await book.loaded.navigation;
+        const navItems = [];
+        if (navigation && navigation.toc && navigation.toc.length > 0) {
+          const flatten = (items) => {
+            items.forEach(item => {
+              navItems.push({ label: item.label.trim(), href: item.href });
+              if (item.subitems && item.subitems.length) flatten(item.subitems);
+            });
+          };
+          flatten(navigation.toc);
+        }
+
+        // Itera sobre as seções do Spine do ePub
+        const spine = book.spine;
+        let chapterIndex = 0;
+
+        for (const item of spine.items) {
+          try {
+            const doc = await item.load(book.load.bind(book));
+            const body = doc.querySelector('body');
+
+            if (body) {
+              const chapterSection = document.createElement('section');
+              const chapterId = `chapter-${chapterIndex}`;
+              chapterSection.id = chapterId;
+              chapterSection.className = 'chapter-block mb-16 border-b pb-8 transition-opacity duration-300';
+              chapterSection.style.borderColor = 'var(--panel-border)';
+
+              // Título de referência no sumário
+              let chapterTitleText = `Capítulo ${chapterIndex + 1}`;
+              const heading = body.querySelector('h1, h2, h3, title');
+              if (heading && heading.textContent.trim()) {
+                chapterTitleText = heading.textContent.trim();
+              } else if (navItems[chapterIndex]) {
+                chapterTitleText = navItems[chapterIndex].label;
+              }
+
+              state.tocItems.push({
+                label: chapterTitleText,
+                targetId: chapterId
+              });
+
+              // Limpeza e saneamento básico do HTML do capítulo
+              // Remove scripts, estilos embutidos e tags indesejadas
+              body.querySelectorAll('script, style, link, meta').forEach(el => el.remove());
+              
+              // Ajusta imagens locais se houver
+              body.querySelectorAll('img').forEach(img => {
+                img.className = 'mx-auto my-4 max-w-full h-auto rounded shadow-sm';
+              });
+
+              chapterSection.innerHTML = body.innerHTML;
+              readerContainer.appendChild(chapterSection);
+              chapterIndex++;
+            }
+          } catch (secError) {
+            console.warn('Erro ao processar item do spine:', secError);
+          }
+        }
+
+        buildTocList();
+        emptyState.classList.add('hidden');
+        readerContainer.classList.remove('hidden');
+        applyFontSize();
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        showToast('EPUB carregado com sucesso!');
+      } catch (err) {
+        console.error('Falha ao abrir EPUB:', err);
+        showToast('Erro ao carregar o arquivo EPUB');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    async function loadPdfFile(file) {
+      showLoading('Processando páginas do PDF...');
+      readerContainer.innerHTML = '';
+      state.tocItems = [];
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        state.currentBookTitle = file.name.replace(/\.[^/.]+$/, "");
+        currentDocTitle.textContent = state.currentBookTitle;
+        currentDocTitle.title = state.currentBookTitle;
+
+        // Tenta obter o sumário nativo (outline) do PDF
+        try {
+          const outline = await pdf.getOutline();
+          if (outline && outline.length > 0) {
+            outline.forEach(item => {
+              state.tocItems.push({
+                label: item.title,
+                pageRef: item.dest
+              });
+            });
+          }
+        } catch (e) {
+          console.warn('Outline PDF não disponível');
+        }
+
+        const totalPages = pdf.numPages;
+
+        // Se o PDF não tiver outline, cria o sumário por blocos de páginas
+        if (state.tocItems.length === 0) {
+          for (let p = 1; p <= totalPages; p += 5) {
+            state.tocItems.push({
+              label: `Página ${p} a ${Math.min(p + 4, totalPages)}`,
+              targetId: `pdf-page-${p}`
+            });
+          }
+        }
+
+        // Renderiza cada página como bloco de texto contínuo justificado
+        for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          
+          const pageContainer = document.createElement('section');
+          pageContainer.id = `pdf-page-${pageNum}`;
+          pageContainer.className = 'pdf-page mb-8';
+
+          // Cabeçalho discreto de número de página
+          const pageHeader = document.createElement('div');
+          pageHeader.className = 'text-center text-xs opacity-50 uppercase tracking-widest my-6 font-mono select-none';
+          pageHeader.textContent = `— Página ${pageNum} de ${totalPages} —`;
+          pageContainer.appendChild(pageHeader);
+
+          // Agrupa os itens de texto do PDF preservando fluxo de parágrafos
+          let currentParagraph = document.createElement('p');
+          let lastY = null;
+
+          for (const item of textContent.items) {
+            const text = item.str;
+            if (!text.trim()) continue;
+
+            // Se houver salto vertical significativo de coordenadas no PDF, quebra parágrafo
+            if (lastY !== null && Math.abs(item.transform[5] - lastY) > 16) {
+              if (currentParagraph.innerText.trim()) {
+                pageContainer.appendChild(currentParagraph);
+              }
+              currentParagraph = document.createElement('p');
+            }
+
+            currentParagraph.appendChild(document.createTextNode(text + ' '));
+            lastY = item.transform[5];
+          }
+
+          if (currentParagraph.innerText.trim()) {
+            pageContainer.appendChild(currentParagraph);
+          }
+
+          readerContainer.appendChild(pageContainer);
+        }
+
+        buildTocList();
+        emptyState.classList.add('hidden');
+        readerContainer.classList.remove('hidden');
+        applyFontSize();
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        showToast('PDF carregado com sucesso!');
+      } catch (err) {
+        console.error('Falha ao processar PDF:', err);
+        showToast('Erro ao ler páginas do PDF');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function buildTocList() {
+      tocList.innerHTML = '';
+
+      if (state.tocItems.length === 0) {
+        tocList.innerHTML = `<div class="p-4 text-center opacity-60 text-xs italic">Nenhum sumário estruturado detectado no livro.</div>`;
+        return;
+      }
+
+      state.tocItems.forEach((item, index) => {
+        const itemBtn = document.createElement('button');
+        itemBtn.className = 'w-full text-left px-3 py-2.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition flex items-center justify-between text-xs sm:text-sm font-medium';
+        itemBtn.innerHTML = `
+          <span class="truncate pr-2">${item.label || `Seção ${index + 1}`}</span>
+          <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+        `;
+
+        itemBtn.addEventListener('click', () => {
+          if (item.targetId) {
+            const targetEl = document.getElementById(item.targetId);
+            if (targetEl) {
+              const yOffset = -80; // compensação do header fixo
+              const y = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+          }
+          closeToc();
+        });
+
+        tocList.appendChild(itemBtn);
+      });
+    }
+
+    function openToc() {
+      tocDrawer.classList.remove('-translate-x-full');
+      tocBackdrop.classList.remove('hidden');
+    }
+
+    function closeToc() {
+      tocDrawer.classList.add('-translate-x-full');
+      tocBackdrop.classList.add('hidden');
+    }
+
+    // Toggle do Sumário
+    document.getElementById('btn-toggle-toc').addEventListener('click', () => {
+      const isOpen = !tocDrawer.classList.contains('-translate-x-full');
+      if (isOpen) closeToc(); else openToc();
+    });
+
+    document.getElementById('btn-close-toc').addEventListener('click', closeToc);
+    tocBackdrop.addEventListener('click', closeToc);
+
+    // Upload de arquivo (ambos os botões: header e tela de boas-vindas)
+    function handleFileSelection(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (ext === 'epub') {
+        state.loadedBookType = 'epub';
+        loadEpubFile(file);
+      } else if (ext === 'pdf') {
+        state.loadedBookType = 'pdf';
+        loadPdfFile(file);
+      } else {
+        showToast('Formato não suportado. Escolha um arquivo .epub ou .pdf');
+      }
+    }
+
+    document.getElementById('file-input').addEventListener('change', handleFileSelection);
+    document.getElementById('file-input-welcome').addEventListener('change', handleFileSelection);
+
+    // Controles de Play / Pause do Auto Scroll
+    btnPlayScroll.addEventListener('click', toggleAutoScroll);
+    floatPlayBtn.addEventListener('click', toggleAutoScroll);
+
+    // Avançar / Recuar 1 Step manualmente
+    document.getElementById('btn-scroll-step-forward').addEventListener('click', () => {
+      window.scrollBy({ top: getLineHeightInPixels() * state.linesPerStep, behavior: 'smooth' });
+    });
+
+    document.getElementById('btn-scroll-step-back').addEventListener('click', () => {
+      window.scrollBy({ top: -(getLineHeightInPixels() * state.linesPerStep), behavior: 'smooth' });
+    });
+
+    // Aumentar / Diminuir Fonte
+    document.getElementById('btn-font-inc').addEventListener('click', () => {
+      if (state.fontSize < 38) {
+        state.fontSize += 1;
+        applyFontSize();
+      }
+    });
+
+    document.getElementById('btn-font-dec').addEventListener('click', () => {
+      if (state.fontSize > 13) {
+        state.fontSize -= 1;
+        applyFontSize();
+      }
+    });
+
+    // Alternar Barra de Configurações de Rolagem
+    document.getElementById('btn-speed-panel').addEventListener('click', () => {
+      scrollSettingsBar.classList.toggle('hidden');
+    });
+
+    // Seleção de Linhas por Step
+    document.querySelectorAll('.step-line-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.step-line-btn').forEach(b => {
+          b.className = 'step-line-btn px-2.5 py-1 border font-semibold border-gray-300';
+        });
+        const target = e.currentTarget;
+        target.className = 'step-line-btn px-2.5 py-1 border font-semibold bg-blue-600 text-white border-blue-600';
+        state.linesPerStep = parseInt(target.getAttribute('data-lines'), 10);
+        updateStepIndicator();
+        showToast(`${state.linesPerStep} linha(s) por passo`);
+      });
+    });
+
+    // Slider de Velocidade
+    speedSlider.addEventListener('input', (e) => {
+      state.speedSeconds = parseFloat(e.target.value);
+      speedValueLabel.textContent = `${state.speedSeconds.toFixed(1)}s`;
+      resetAutoScrollInterval();
+    });
+
+    // Alternador de Temas
+    document.querySelectorAll('[data-set-theme]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const theme = e.currentTarget.getAttribute('data-set-theme');
+        document.body.setAttribute('data-theme', theme);
+      });
+    });
+
+    // Tecla de Espaço para Pausar/Continuar Auto-Scroll
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target === document.body) {
+        e.preventDefault();
+        toggleAutoScroll();
+      }
+    });
+
+    applyFontSize();
+    updateStepIndicator();
+  </script>
+</body>
+</html>
