@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kokology (心ロジー) • O Espelho da Mente</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            zen: {
+              bg: '#FAF8F5',
+              darkbg: '#141417',
+              card: '#FFFFFF',
+              darkcard: '#1F1F24',
+              accent: '#B85D43', // Vermelho terracota/lacado japonês
+              accentHover: '#A04E36',
+              indigo: '#2C3E50',
+              bamboo: '#4A6B53',
+              paper: '#F2EDE4',
+              ink: '#1D1D1F',
+              gold: '#C5A059'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            serif: ['"Noto Serif JP"', 'Georgia', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Noto Serif JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Transições suaves globais */
+    * {
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+    
+    /* Efeito de fade sutil */
+    .fade-in {
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Scrollbar minimalista */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(184, 93, 67, 0.2);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(184, 93, 67, 0.4);
+    }
+  </style>
+</head>
+
+<body class="bg-zen-bg dark:bg-zen-darkbg text-zen-ink dark:text-stone-100 min-h-screen font-sans flex flex-col antialiased selection:bg-zen-accent selection:text-white">
+
+  <!-- Toast de Notificação -->
+  <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-120%] opacity-0 transition-all duration-300 pointer-events-none bg-stone-900 text-stone-100 dark:bg-stone-100 dark:text-stone-900 px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-sm font-medium border border-stone-700/30">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+    <span id="toast-message">Notificação</span>
+  </div>
+
+  <!-- Header / Barra de Navegação -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-zen-bg/85 dark:bg-zen-darkbg/85 border-b border-stone-200 dark:border-stone-800">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      
+      <!-- Logotipo -->
+      <a href="#" onclick="showView('home'); return false;" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 rounded-xl bg-zen-accent flex items-center justify-center text-white shadow-md shadow-zen-accent/20 transition-transform group-hover:scale-105">
+          <span class="font-serif font-bold text-lg leading-none">心</span>
+        </div>
+        <div>
+          <span class="font-serif font-bold text-lg tracking-tight block leading-tight text-zen-ink dark:text-white">Kokology</span>
+          <span class="text-[10px] text-stone-500 uppercase tracking-widest font-semibold block">O Espelho da Mente</span>
+        </div>
+      </a>
+
+      <!-- Ações rápidas da barra -->
+      <div class="flex items-center gap-2">
+        <button onclick="showView('profile')" class="relative flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-200/70 hover:bg-stone-300/70 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 transition-colors">
+          <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Meu Perfil</span>
+          <span id="badge-completed" class="w-4 h-4 rounded-full bg-zen-accent text-white flex items-center justify-center text-[10px]">0</span>
+        </button>
+
+        <!-- Alternador de Tema -->
+        <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-full hover:bg-stone-200 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition-colors" title="Alternar tema">
+          <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container Principal -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
+
+    <!-- VIEW: Home (Catálogo de Testes) -->
+    <section id="view-home" class="fade-in space-y-10">
+      
+      <!-- Hero Banner Zen -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-stone-900 via-stone-800 to-zen-indigo text-white p-8 sm:p-12 shadow-xl">
+        <div class="relative z-10 max-w-2xl space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur text-stone-200 text-xs tracking-wider uppercase font-semibold">
+            <span class="w-2 h-2 rounded-full bg-zen-accent animate-pulse"></span>
+            Psicologia Projetiva Japonesa
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-serif font-bold tracking-tight text-white leading-tight">
+            Descubra o que o seu inconsciente guarda em silêncio.
+          </h1>
+          <p class="text-stone-300 text-sm sm:text-base leading-relaxed">
+            Criado pelo psicólogo Isamu Saito e pelo autor Tadahiko Nagao, o <strong>Kokology</strong> (de <em>Kokoro</em>, "coração/mente") utiliza pequenos cenários guiados e lúdicos para revelar verdades profundas sobre amor, defesas, crises e prioridades de vida.
+          </p>
+          <div class="pt-2 flex flex-wrap items-center gap-3">
+            <button onclick="startFirstIncompleteTest()" class="px-5 py-2.5 rounded-xl bg-zen-accent hover:bg-zen-accentHover text-white text-sm font-semibold shadow-lg shadow-zen-accent/30 flex items-center gap-2 transition-all hover:translate-y-[-1px]">
+              <i data-lucide="compass" class="w-4 h-4"></i>
+              <span>Começar Jornada</span>
+            </button>
+            <button onclick="showView('profile')" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-semibold backdrop-blur transition-all">
+              Ver Relatório do Kokoro
+            </button>
+          </div>
+        </div>
+
+        <!-- Elemento visual de fundo -->
+        <div class="absolute -right-10 -bottom-10 opacity-10 select-none pointer-events-none font-serif text-[18rem] text-white leading-none">
+          心
+        </div>
+      </div>
+
+      <!-- Lista de Testes -->
+      <div>
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-serif font-bold tracking-tight text-zen-ink dark:text-white">Selecione uma Jornada</h2>
+            <p class="text-xs sm:text-sm text-stone-500 dark:text-stone-400">Responda com o primeiro pensamento que vier à sua mente, sem filtros lógicos.</p>
+          </div>
+          <button onclick="resetAllProgress()" class="text-xs text-stone-400 hover:text-zen-accent flex items-center gap-1 transition-colors">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>Reiniciar Tudo</span>
+          </button>
+        </div>
+
+        <div id="tests-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Os cards de testes são renderizados via JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- VIEW: Test Player -->
+    <section id="view-test" class="hidden fade-in max-w-3xl mx-auto space-y-6">
+      
+      <!-- Botão Voltar & Indicadores de Progresso -->
+      <div class="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
+        <button onclick="showView('home')" class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-stone-500 hover:text-zen-ink dark:hover:text-white transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Voltar ao Menu</span>
+        </button>
+        <span id="test-number-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 uppercase tracking-widest">
+          Cenário 1 de 7
+        </span>
+      </div>
+
+      <!-- Container do Cartão do Teste -->
+      <div class="bg-white dark:bg-zen-darkcard rounded-3xl p-6 sm:p-10 shadow-xl border border-stone-200/60 dark:border-stone-800/80 space-y-8 relative overflow-hidden">
+        
+        <!-- Cabeçalho do Teste Atual -->
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span id="test-category" class="text-[11px] font-bold uppercase tracking-widest text-zen-accent">Psicologia do Futuro</span>
+          </div>
+          <h2 id="test-title" class="text-2xl sm:text-3xl font-serif font-bold text-zen-ink dark:text-white">
+            O Pássaro Azul
+          </h2>
+          <p id="test-quote" class="text-xs text-stone-400 italic font-serif">
+            "A mente reage aos ventos da incerteza antes que a razão decida a rota."
+          </p>
+        </div>
+
+        <!-- Modo de Imaginação / Mindfulness Guiado -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-zen-paper dark:bg-stone-900/60 border border-stone-200/80 dark:border-stone-800 space-y-3">
+          <div class="flex items-center gap-2 text-zen-accent dark:text-zen-gold text-xs font-semibold uppercase tracking-wider">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>Feche os olhos e imagine a cena</span>
+          </div>
+          <p id="test-scenario" class="text-sm sm:text-base leading-relaxed text-stone-700 dark:text-stone-300 font-serif">
+            Cenário narrativo sendo preparado...
+          </p>
+        </div>
+
+        <!-- Área de Interação / Escolha da Resposta -->
+        <div id="test-interaction-container" class="space-y-4">
+          <div class="flex items-center justify-between">
+            <label id="test-question-prompt" class="text-sm font-semibold text-zen-ink dark:text-stone-200">
+              Qual é a sua escolha?
+            </label>
+            <span class="text-[11px] text-stone-400">Escolha intuitiva</span>
+          </div>
+          
+          <!-- Elemento de Escolha Dinâmica (Botões ou Drag-Drop) -->
+          <div id="test-input-area" class="space-y-3">
+            <!-- Injetado dinamicamente -->
+          </div>
+        </div>
+
+        <!-- Bloco de Revelação Psicológica (Oculto inicialmente) -->
+        <div id="interpretation-box" class="hidden pt-6 border-t border-stone-200 dark:border-stone-800 space-y-5 fade-in">
+          
+          <div class="flex items-start gap-4 p-4 rounded-2xl bg-stone-50 dark:bg-stone-800/40 border border-stone-200 dark:border-stone-700">
+            <div class="w-10 h-10 rounded-xl bg-zen-accent/10 dark:bg-zen-accent/20 flex items-center justify-center text-zen-accent flex-shrink-0">
+              <i data-lucide="eye" class="w-5 h-5"></i>
+            </div>
+            <div class="space-y-1">
+              <span class="text-xs uppercase tracking-wider font-bold text-zen-accent">O Que Significa Este Símbolo</span>
+              <h4 id="interp-symbol-title" class="text-sm sm:text-base font-bold text-zen-ink dark:text-white">O Pássaro e a Incerteza</h4>
+              <p id="interp-symbol-desc" class="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+                Explicação geral do teste.
+              </p>
+            </div>
+          </div>
+
+          <!-- Interpretação individual baseada na escolha -->
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-zen-paper to-white dark:from-stone-900 dark:to-zen-darkcard border border-zen-accent/20 dark:border-zen-gold/20 shadow-sm space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-zen-accent text-white uppercase" id="user-choice-badge">Sua Escolha</span>
+              <span class="text-xs text-stone-400">Diagnóstico do Kokoro</span>
+            </div>
+            <h3 id="interp-choice-title" class="text-base sm:text-lg font-serif font-bold text-zen-ink dark:text-white">
+              Título da Análise
+            </h3>
+            <p id="interp-choice-text" class="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+              Interpretação psicológica detalhada.
+            </p>
+          </div>
+
+          <!-- Botões de Navegação Após Conclusão -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <button onclick="showView('home')" class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+              Explorar Outros Testes
+            </button>
+            <div class="flex items-center gap-2">
+              <button id="btn-next-test" onclick="goToNextTest()" class="px-5 py-2.5 rounded-xl bg-zen-accent hover:bg-zen-accentHover text-white text-xs sm:text-sm font-semibold shadow-md flex items-center gap-2 transition-all">
+                <span>Próximo Teste</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW: Perfil do Kokoro (Relatório Final) -->
+    <section id="view-profile" class="hidden fade-in max-w-4xl mx-auto space-y-8">
+      
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
+        <div>
+          <button onclick="showView('home')" class="inline-flex items-center gap-1.5 text-xs text-stone-500 hover:text-zen-ink dark:hover:text-white mb-2 transition-colors">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <span>Voltar ao Menu Principal</span>
+          </button>
+          <h2 class="text-2xl sm:text-3xl font-serif font-bold text-zen-ink dark:text-white">Perfil do Kokoro (心)</h2>
+          <p class="text-xs sm:text-sm text-stone-500 dark:text-stone-400">O mapa consolidado das suas respostas e projeções do subconsciente.</p>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <button onclick="copyProfileToClipboard()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 flex items-center gap-1.5 transition-colors">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span>Copiar Relatório</span>
+          </button>
+          <button onclick="window.print()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-zen-accent hover:bg-zen-accentHover text-white flex items-center gap-1.5 transition-colors">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+            <span>Imprimir / PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Status de Progresso Geral -->
+      <div class="bg-white dark:bg-zen-darkcard rounded-2xl p-6 border border-stone-200 dark:border-stone-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h3 class="font-serif font-bold text-base text-zen-ink dark:text-white">Seu Nível de Autoconhecimento</h3>
+          <p id="profile-status-text" class="text-xs text-stone-500 mt-0.5">Você concluiu 0 de 7 testes de Kokology.</p>
+        </div>
+        <div class="w-full sm:w-60 bg-stone-200 dark:bg-stone-700 h-2.5 rounded-full overflow-hidden">
+          <div id="progress-bar-fill" class="bg-zen-accent h-full w-0 transition-all duration-500"></div>
+        </div>
+      </div>
+
+      <!-- Lista de Revelações Armazenadas -->
+      <div id="profile-cards-container" class="space-y-4">
+        <!-- Renderizado dinamicamente -->
+      </div>
+
+      <!-- Reflexão Filosófica de Conclusão -->
+      <div class="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-zen-paper to-stone-100 dark:from-stone-900 dark:to-zen-darkcard border border-stone-200 dark:border-stone-800 text-center space-y-3">
+        <span class="font-serif text-3xl text-zen-accent">一期一会</span>
+        <h4 class="font-serif font-bold text-lg text-zen-ink dark:text-white">Ichigo Ichie: Cada momento é único</h4>
+        <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-400 max-w-xl mx-auto leading-relaxed">
+          No Kokology não existem respostas certas ou erradas. Nossas escolhas projetivas refletem nosso estado de espírito no presente. Refaça estes testes em fases diferentes da sua vida para testemunhar a metamorfose da sua mente.
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Rodapé Zen -->
+  <footer class="border-t border-stone-200 dark:border-stone-800 py-6 text-center text-xs text-stone-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>© 2026 Kokology SPA • Inspirado nas obras de Isamu Saito & Tadahiko Nagao.</p>
+      <p class="text-stone-400 font-serif">心 (Kokoro) = Coração, Espírito e Mente.</p>
+    </div>
+  </footer>
+
+  <script>
+    // DADOS COMPLETOS DOS TESTES DE KOKOLOGY
+    const KOKOLOGY_TESTS = [
+      {
+        id: "bluebird",
+        order: 1,
+        title: "O Pássaro Azul",
+        subtitle: "The Blue Bird",
+        kanji: "青い鳥",
+        category: "Crises & Incerteza",
+        description: "Um pássaro preso na sua janela muda sucessivamente de cor. Que cor ele assumirá no quinto dia?",
+        scenario: "Imagine que um lindo pássaro com penas azul-celeste entra voando pela janela do seu quarto e fica preso. Encantado por sua beleza dócil, você decide adotá-lo e cuidar dele. No entanto, na manhã seguinte, para seu espanto, o pássaro mudou de cor e ficou AMARELO. No terceiro dia, torna-se VERMELHO vivo. No quarto dia, ele acorda inteiramente PRETO. Ao abrir os olhos no quinto dia, que cor o pássaro assumiu?",
+        prompt: "Ao acordar no quinto dia, de que cor está o pássaro?",
+        symbolTitle: "O Pássaro e as Incertezas do Destino",
+        symbolDesc: "O pássaro azul que entra sem pedir permissão simboliza uma surpresa ou crise súbita que abala sua rotina. As cores que ele assume representam as flutuações da vida e sua expectativa sobre a resolução de problemas.",
+        type: "choice",
+        options: [
+          {
+            id: "black",
+            label: "Permanece Preto",
+            colorHint: "#262626",
+            resultTitle: "Pessimismo Vigilante & Dificuldade de Desapegar da Crise",
+            resultDesc: "Você tem tendência a antecipar o pior cenário possível. Quando uma crise se instala, você tende a acreditar que as coisas nunca mais voltarão a ser leves. Seu lado pragmático o protege de ilusões, mas cultivar o otimismo aliviará o peso diário dos seus pensamentos."
+          },
+          {
+            id: "blue",
+            label: "Voltou a ser Azul",
+            colorHint: "#2563EB",
+            resultTitle: "Otimismo Sereno & Equilíbrio Prático",
+            resultDesc: "Você acredita firmemente que a vida sempre retorna ao seu ponto de harmonia natural. Não entra em pânico com facilidade diante de reveses temporários, pois sabe que tempestades passam. É uma pessoa de convivência serena e estável."
+          },
+          {
+            id: "white",
+            label: "Ficou Branco Puro",
+            colorHint: "#F3F4F6",
+            resultTitle: "Resiliência Plena & Facilidade de Recomeço",
+            resultDesc: "Você possui a rara habilidade de zerar o placar mental. Quando as coisas dão errado, você não perde tempo lamentando; aceita a mudança, aprende a lição e começa uma nova página sem guardar rancor ou apego ao passado."
+          },
+          {
+            id: "gold",
+            label: "Tornou-se Dourado",
+            colorHint: "#D97706",
+            resultTitle: "Ousadia Heroica & Foco na Oportunidade",
+            resultDesc: "Você é movido a bravura e vê em qualquer crise uma chance oculta de brilhar e evoluir. Para você, 'impossível' é apenas uma palavra temporária. Só cuide para que o excesso de autoconfiança não subestime riscos reais."
+          }
+        ]
+      },
+      {
+        id: "cave",
+        order: 2,
+        title: "A Caverna Misteriosa",
+        subtitle: "The Dark Cave",
+        kanji: "洞窟",
+        category: "Medos Inconscientes",
+        description: "Você adentra uma gruta escura com uma tocha e se depara com uma criatura escondida na escuridão.",
+        scenario: "Você está caminhando sozinho por uma densa floresta ancestral e encontra uma fenda rochosa que leva a uma caverna profunda e escura. Você acende uma tocha e desce calmamente pelas galerias silenciosas. Em uma curva estreita, você avista uma criatura viva observando você das sombras. Que criatura é essa, e como ela se comporta no momento em que seus olhares se cruzam?",
+        prompt: "Como é a criatura nas sombras e qual a reação imediata dela?",
+        symbolTitle: "A Caverna e o Porão do Subconsciente",
+        symbolDesc: "A caverna é a representação do seu inconsciente mais profundo e esquecido. A criatura que reside lá dentro personifica os medos reprimidos e sua estratégia emocional de sobrevivência diante do desconhecido.",
+        type: "choice",
+        options: [
+          {
+            id: "beast-attack",
+            label: "Uma fera violenta que rosna e ameaça atacar",
+            icon: "flame",
+            resultTitle: "Medo de Confronto & Impulsos Descontrolados",
+            resultDesc: "Seu medo oculto reside em perder o autocontrole ou ser confrontado agressivamente por figuras de autoridade. Você gasta muita energia contendo suas próprias frustrações para manter uma fachada pacífica."
+          },
+          {
+            id: "scared-animal",
+            label: "Um animal pequeno, trêmulo e assustado",
+            icon: "heart-crack",
+            resultTitle: "Medo da Vulnerabilidade & Medo de Rejeição",
+            resultDesc: "No fundo, você teme ser julgado ou ridicularizado se mostrar seus sentimentos reais. Você tende a erguer muros de defesa para proteger um interior muito sensível e empático."
+          },
+          {
+            id: "mystic-human",
+            label: "Um ser místico ou um ermitão calmo",
+            icon: "sparkle",
+            resultTitle: "Busca por Sabedoria & Medo da Superficialidade",
+            resultDesc: "Você teme levar uma vida vazia ou sem propósito verdadeiro. O seu inconsciente busca constante elevação espiritual e intelectual, e seu maior receio é ficar cercado por hipocrisia e relações rasas."
+          },
+          {
+            id: "empty-shadow",
+            label: "Era apenas a sua própria sombra projetada na rocha",
+            icon: "user",
+            resultTitle: "Autocrítica Severa & O Conflito com o Ego",
+            resultDesc: "Seu maior adversário não está no mundo exterior: é a sua própria cobrança interna. Você percebe com lucidez que grande parte dos monstros que tiram seu sono são criados pela sua imaginação acelerada."
+          }
+        ]
+      },
+      {
+        id: "teacup",
+        order: 3,
+        title: "A Xícara de Chá",
+        subtitle: "The Teacup",
+        kanji: "茶碗",
+        category: "Afeto & Casamento",
+        description: "A forma como você segura, bebe e cuida da sua xícara revela sua intimidade cotidiana.",
+        scenario: "Após uma longa caminhada na serra, você é convidado para entrar em uma aconchegante casa de chá de madeira. O anfitrião prepara uma infusão fumegante e serve o chá em uma xícara artesanal singular de cerâmica. Repare no formato da xícara e no seu ritual ao consumi-la: como você desfruta desse momento e o que faz quando a última gota acaba?",
+        prompt: "Qual foi o seu comportamento com a xícara e a bebida?",
+        symbolTitle: "O Chá e a Vida a Dois",
+        symbolDesc: "A xícara simboliza o ambiente de intimidade, a parceria amorosa e a rotina do lar. A velocidade e o cuidado com a cerâmica expressam como você lida com os compromissos afetivos.",
+        type: "choice",
+        options: [
+          {
+            id: "slow-sip",
+            label: "Espero amornar com calma e lavo a xícara na mesma hora",
+            icon: "coffee",
+            resultTitle: "Paciência, Parceria Maduro e Organização Familiar",
+            resultDesc: "No amor, você valoriza a previsibilidade, o respeito mútuo e a lealdade. Para você, uma relação se constrói no cuidado diário das pequenas tarefas e em diálogos sem pressa."
+          },
+          {
+            id: "fast-drink",
+            label: "Bebo enquanto está bem quente e deixo a xícara na mesa",
+            icon: "zap",
+            resultTitle: "Paixão Intensa, Espontaneidade & Desapego da Rotina",
+            resultDesc: "Você se atira aos sentimentos com energia vulcânica. Ama a fase da paixão efervescente e do arrebatamento, mas tende a se entediar quando o relacionamento vira uma sucessão monótona de boletos e tarefas domésticas."
+          },
+          {
+            id: "admire-craft",
+            label: "Fico admirando os detalhes da cerâmica antes de provar",
+            icon: "gem",
+            resultTitle: "Sensibilidade Estética & Exigência Emocional",
+            resultDesc: "Você procura um parceiro que compartilhe refinamento mental, bom gosto e conversas ricas. É afetuoso, mas pode ser exigente demais, esperando perfeição de seres humanos imperfeitos."
+          },
+          {
+            id: "share-tea",
+            label: "Ofereço o primeiro gole a quem estiver comigo",
+            icon: "users",
+            resultTitle: "Altruísmo Genuíno & Dedicação Plena ao Outro",
+            resultDesc: "Sua felicidade no romance decorre de ver a pessoa amada bem cuidada e nutrida. Seu desafio é lembrar-se de que suas próprias vontades têm o mesmo peso das vontades do parceiro."
+          }
+        ]
+      },
+      {
+        id: "museum",
+        order: 4,
+        title: "A Pintura no Museu",
+        subtitle: "The Museum Gallery",
+        kanji: "絵画",
+        category: "Autoimagem & Crítica",
+        description: "Você está diante de uma obra de arte marcante e uma voz sussurra algo inesperado em seu ouvido.",
+        scenario: "Você visita um museu de arte contemporânea e os corredores estão extraordinariamente vazios. Em uma sala silenciosa, uma pintura imensa captura sua atenção de maneira magnética. Enquanto você a contempla hipnotizado, alguém se aproxima suavemente por trás e sussurra um comentário no seu ouvido. O que a pintura retrata e qual foi o tom do sussurro?",
+        prompt: "Qual tema da tela mais atraiu você e qual o espírito do sussurro?",
+        symbolTitle: "A Galeria e a Reação ao Julgamento",
+        symbolDesc: "A pintura é um espelho do seu momento anímico atual. As palavras sussurradas por trás representam como seu ego processa opiniões alheias e conselhos que você não pediu.",
+        type: "choice",
+        options: [
+          {
+            id: "calm-nature",
+            label: "Uma paisagem idílica e um sussurro elogioso de cumplicidade",
+            icon: "sun",
+            resultTitle: "Harmonia Interna & Aberto a Validação Saudável",
+            resultDesc: "Sua mente está em um ciclo de relativa serenidade. Você tem boa receptividade a opiniões externas quando elas são ditas com respeito e polidez, mantendo seu eixo seguro."
+          },
+          {
+            id: "storm-battle",
+            label: "Uma tempestade furiosa e uma crítica ácida desmerecendo a obra",
+            icon: "cloud-lightning",
+            resultTitle: "Turbulência Emocional & Hipervigilância a Críticas",
+            resultDesc: "Você está passando por um momento de alta demanda interna e conflitos não resolvidos. Diante de comentários críticos, você tende a se armar ou remoer mentalmente por horas o que ouviu."
+          },
+          {
+            id: "abstract-mystery",
+            label: "Geometria abstrata indecifrável e um sussurro sarcástico",
+            icon: "boxes",
+            resultTitle: "Questionamento Existencial & Autodefesa Cínica",
+            resultDesc: "Você está em fase de redefinição de valores. Diante de palpites sobre sua vida particular, você prefere ironizar e mudar de assunto do que demonstrar que foi tocado."
+          },
+          {
+            id: "portrait-eyes",
+            label: "Um retrato com olhos vivos que parecem segui-lo",
+            icon: "eye",
+            resultTitle: "Introspecção Profunda & Necessidade de Autenticidade",
+            resultDesc: "Você se preocupa genuinamente com o impacto que causa no mundo. Tem uma empatia afiada, mas precisa aprender a fechar os ouvidos para os julgamentos de quem não conhece sua história."
+          }
+        ]
+      },
+      {
+        id: "animals",
+        order: 5,
+        title: "A Travessia dos Animais",
+        subtitle: "The Desert Journey",
+        kanji: "動物の旅",
+        category: "Valores Sob Pressão Extrema",
+        description: "Você atravessa um terreno inóspito com quatro animais e deve abandoná-los um a um.",
+        scenario: "Você está realizando uma travessia crucial por um deserto árido acompanhado por quatro fiéis companheiros de jornada: um LEÃO, um CAVALO, uma OVELHA e um MACACO. Com os mantimentos diminuindo vertiginosamente sob o sol implacável, a sobrevivência exige que você se despeça dos animais pelo caminho, um a um. Ordene os animais começando pelo PRIMEIRO que você deixaria até o ÚLTIMO que você manteria consigo até o fim!",
+        prompt: "Ordene os animais do primeiro a ser deixado (topo) até o último fiel guardado (base):",
+        symbolTitle: "Os Quatro Pilares do Destino",
+        symbolDesc: "Cada animal representa um valor vital da existência humana: Leão = Orgulho e Poder; Cavalo = Trabalho e Carreira; Ovelha = Amor e Família; Macaco = Diversão e Amizades. A ordem de descarte revela suas prioridades sob estresse agudo.",
+        type: "ordering",
+        items: [
+          { id: "lion", name: "Leão", symbol: "Orgulho, Independência e Ambição", icon: "shield" },
+          { id: "horse", name: "Cavalo", symbol: "Carreira, Dever e Sustento Prático", icon: "briefcase" },
+          { id: "sheep", name: "Ovelha", symbol: "Amor romântico, Casamento e Família", icon: "heart" },
+          { id: "monkey", name: "Macaco", symbol: "Humor, Leveza, Amigos e Lazer", icon: "smile" }
+        ]
+      },
+      {
+        id: "chest",
+        order: 6,
+        title: "A Chave e o Baú",
+        subtitle: "The Key and The Chest",
+        kanji: "鍵と宝箱",
+        category: "Intimidade & Desejo",
+        description: "Na areia da praia, você desenterra uma chave e um baú lacrado. O que eles revelam?",
+        scenario: "Caminhando por uma praia isolada ao entardecer, a maré baixa revela na areia uma chave antiga de metal. Poucos passos adiante, você encontra um baú robusto parcialmente enterrado. Você encaixa a chave na fechadura: ela vira com extrema suavidade ou exige esforço e jogo de cintura? E quando a tampa pesada se abre, o que há guardado no interior?",
+        prompt: "Como a fechadura reagiu e o que você encontrou dentro do baú?",
+        symbolTitle: "A Chave e a Abertura Sexual/Afetiva",
+        symbolDesc: "A chave e o baú são clássicos arquétipos da sedução, abertura sexual e entrega emocional profunda. A fechadura reflete o grau de resistência à intimidade, e o conteúdo traduz o seu maior tesouro relacional.",
+        type: "choice",
+        options: [
+          {
+            id: "gold-easy",
+            label: "A chave girou suavemente; dentro havia moedas de ouro e joias preciosas",
+            icon: "sparkles",
+            resultTitle: "Intimidade Fluida & Paixão Ardente",
+            resultDesc: "Você encara a sexualidade e a entrega com vitalidade calorosa e poucas travas. Procura relacionamentos magnéticos, intensos e gratificantes, onde o prazer é vivido sem culpas."
+          },
+          {
+            id: "letters-hard",
+            label: "A fechadura emperrou um pouco; dentro havia cartas de amor e memórias antigas",
+            icon: "file-text",
+            resultTitle: "Conexão Emocional Prévia & Vulnerabilidade Cuidadosa",
+            resultDesc: "Você só se entrega intimamente de verdade quando sente segurança afetiva e admiração mútua. Para você, o sexo e o afeto são inseparáveis: seu verdadeiro tesouro é a cumplicidade do coração."
+          },
+          {
+            id: "mirror-smooth",
+            label: "O baú abriu com um clique suave; dentro havia um espelho refletindo seu rosto",
+            icon: "scan",
+            resultTitle: "Autonomia Afetiva & Autodescoberta",
+            resultDesc: "Para você, estar bem consigo mesmo é o pré-requisito fundamental antes de qualquer união amorosa. Você não busca no outro uma 'metade da laranja', mas alguém que some com a sua plenitude individual."
+          },
+          {
+            id: "empty-chest",
+            label: "O baú estava vazio, esperando para ser preenchido",
+            icon: "box",
+            resultTitle: "Espírito Livre & Desejo de Construir Histórias Inéditas",
+            resultDesc: "Você não vive de fantasias do passado ou de padrões pré-moldados. Gosta de descobrir o parceiro do zero e construir a intimidade em um caderno em branco, com autenticidade."
+          }
+        ]
+      },
+      {
+        id: "cube",
+        order: 7,
+        title: "Bônus: O Cubo no Deserto",
+        subtitle: "The Desert Cube",
+        kanji: "砂漠の立方体",
+        category: "Arquétipo do Eu & Rede de Apoio",
+        description: "O célebre teste do Cubo, Escada, Cavalo, Tempestade e Flores no meio da areia infinita.",
+        scenario: "Feche os olhos e visualize um deserto límpido. No meio desse deserto, há um CUBO (repare em seu tamanho, material e onde repousa). Perto dele, há uma ESCADA (repare se está apoiada ou longe). Há também um CAVALO (repare em sua distância e temperamento), uma TEMPESTADE (repare se está perto ou no horizonte) e FLORES (poucas ou muitas, onde brotam?).",
+        prompt: "Como é o arranjo dominante do seu deserto interior?",
+        symbolTitle: "A Geometria da Autoimagem",
+        symbolDesc: "O Cubo = Seu Ego; A Escada = Seus Amigos; O Cavalo = Seu Companheiro Amoroso; A Tempestade = O Estresse Atual; As Flores = Seus Filhos ou Ideias Criativas geradas no mundo.",
+        type: "choice",
+        options: [
+          {
+            id: "cube-transparent",
+            label: "Cubo de vidro translúcido, escada apoiada nele e cavalo manso por perto",
+            icon: "shield-check",
+            resultTitle: "Ego Transparente, Aberto & Confiante",
+            resultDesc: "Você é uma pessoa autêntica, sem máscaras. Seus amigos confiam plenamente em você e sua vida amorosa se ancora na parceria harmoniosa e na proximidade genuína."
+          },
+          {
+            id: "cube-stone-grounded",
+            label: "Cubo sólido de pedra escura firmemente assentado na areia",
+            icon: "box",
+            resultTitle: "Determinação Pragmática & Firmeza de Princípios",
+            resultDesc: "Você é o esteio das pessoas ao redor. Tem um ego robusto, não se abala facilmente com modismos e oferece apoio seguro a quem você ama, embora às vezes pareça teimoso."
+          },
+          {
+            id: "cube-floating-gold",
+            label: "Cubo reluzente levitando no ar com tempestade longe no horizonte",
+            icon: "feather",
+            resultTitle: "Idealismo Sonhador & Otimismo Desconectado da Rotina",
+            resultDesc: "Você tem pensamentos elevados, criatividade fértil e visão inovadora. Tende a manter o estresse a uma distância prudente, mas é importante manter os pés na terra para concretizar suas ideias."
+          },
+          {
+            id: "cube-garden",
+            label: "Cubo cercado de flores vivas com cavalo selvagem correndo livre",
+            icon: "flower-2",
+            resultTitle: "Alma Fértil, Afeto Abundante & Amor por Liberdade",
+            resultDesc: "Você valoriza a criatividade e a vitalidade. Em seus relacionamentos, respeita a individualidade do parceiro e ama criar ambientes calorosos e repletos de beleza."
+          }
+        ]
+      }
+    ];
+
+    // ESTADO DA APLICAÇÃO
+    const STATE = {
+      currentTestId: null,
+      results: {}, // { testId: { choiceId, text, details } }
+      orderingState: [] // para testes de arranjo
+    };
+
+    // Inicialização ao carregar
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedResults();
+      renderHomeTestsGrid();
+      updateProfileStats();
+      lucide.createIcons();
+    });
+
+    // Salvar e carregar do LocalStorage
+    function saveResultsToStorage() {
+      try {
+        localStorage.setItem('kokology_results_v1', JSON.stringify(STATE.results));
+      } catch (e) {
+        console.warn('LocalStorage inacessível');
+      }
+    }
+
+    function loadSavedResults() {
+      try {
+        const saved = localStorage.getItem('kokology_results_v1');
+        if (saved) {
+          STATE.results = JSON.parse(saved);
+        }
+      } catch (e) {
+        STATE.results = {};
+      }
+    }
+
+    function resetAllProgress() {
+      if (Object.keys(STATE.results).length === 0) {
+        showToast('Nenhum progresso gravado ainda.');
+        return;
+      }
+      STATE.results = {};
+      saveResultsToStorage();
+      renderHomeTestsGrid();
+      updateProfileStats();
+      showToast('Todo o histórico do Kokoro foi reiniciado.');
+    }
+
+    // Alternar tema (Dark / Light)
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('kokology_theme', 'light');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('kokology_theme', 'dark');
+      }
+      lucide.createIcons();
+    }
+
+    // Checar preferência salva de tema
+    (function initTheme() {
+      const savedTheme = localStorage.getItem('kokology_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+
+    // Notificações Toast
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-message');
+      text.innerText = msg;
+      toast.classList.remove('translate-y-[-120%]', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-120%]', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3000);
+    }
+
+    // Gerenciador de Views (SPA)
+    function showView(viewName) {
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('view-test').classList.add('hidden');
+      document.getElementById('view-profile').classList.add('hidden');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (viewName === 'home') {
+        document.getElementById('view-home').classList.remove('hidden');
+        renderHomeTestsGrid();
+      } else if (viewName === 'test') {
+        document.getElementById('view-test').classList.remove('hidden');
+      } else if (viewName === 'profile') {
+        document.getElementById('view-profile').classList.remove('hidden');
+        renderProfileView();
+      }
+      updateProfileStats();
+      lucide.createIcons();
+    }
+
+    function renderHomeTestsGrid() {
+      const grid = document.getElementById('tests-grid');
+      grid.innerHTML = '';
+
+      KOKOLOGY_TESTS.forEach(test => {
+        const isDone = !!STATE.results[test.id];
+        const card = document.createElement('div');
+        card.className = `group bg-white dark:bg-zen-darkcard rounded-3xl p-6 border transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px] flex flex-col justify-between ${
+          isDone ? 'border-zen-accent/40 dark:border-zen-accent/40 bg-zen-paper/30 dark:bg-stone-900/40' : 'border-stone-200/80 dark:border-stone-800'
+        }`;
+
+        card.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-widest text-zen-accent">${test.category}</span>
+              <span class="font-serif text-lg text-stone-300 dark:text-stone-600 font-bold group-hover:text-zen-accent transition-colors">${test.kanji}</span>
+            </div>
+
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="font-serif font-bold text-lg sm:text-xl text-zen-ink dark:text-white group-hover:text-zen-accent transition-colors">
+                  ${test.order}. ${test.title}
+                </h3>
+              </div>
+              <p class="text-xs text-stone-400 font-serif italic">${test.subtitle}</p>
+            </div>
+
+            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+              ${test.description}
+            </p>
+          </div>
+
+          <div class="pt-6 mt-4 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold ${isDone ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-400'}">
+              <i data-lucide="${isDone ? 'check-circle' : 'circle'}" class="w-3.5 h-3.5"></i>
+              ${isDone ? 'Concluído' : 'Pendente'}
+            </span>
+
+            <button onclick="startTest('${test.id}')" class="px-4 py-2 rounded-xl text-xs font-semibold ${
+              isDone 
+                ? 'bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200' 
+                : 'bg-zen-accent hover:bg-zen-accentHover text-white shadow-sm'
+            } transition-all">
+              ${isDone ? 'Refazer' : 'Explorar'}
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function startFirstIncompleteTest() {
+      const incomplete = KOKOLOGY_TESTS.find(t => !STATE.results[t.id]);
+      if (incomplete) {
+        startTest(incomplete.id);
+      } else {
+        startTest(KOKOLOGY_TESTS[0].id);
+      }
+    }
+
+    function startTest(testId) {
+      STATE.currentTestId = testId;
+      const test = KOKOLOGY_TESTS.find(t => t.id === testId);
+      if (!test) return;
+
+      // Preenchimento de textos
+      document.getElementById('test-number-badge').innerText = `Cenário ${test.order} de ${KOKOLOGY_TESTS.length}`;
+      document.getElementById('test-category').innerText = test.category;
+      document.getElementById('test-title').innerText = `${test.title} • ${test.kanji}`;
+      document.getElementById('test-quote').innerText = `"${test.subtitle}" — Desperte sua imaginação sem julgamentos.`;
+      document.getElementById('test-scenario').innerText = test.scenario;
+      document.getElementById('test-question-prompt').innerText = test.prompt;
+
+      // Resetar visualização de interpretação
+      const interpBox = document.getElementById('interpretation-box');
+      interpBox.classList.add('hidden');
+
+      // Montar input específico (Múltipla Escolha vs Ordenação)
+      const inputArea = document.getElementById('test-input-area');
+      inputArea.innerHTML = '';
+
+      if (test.type === 'choice') {
+        renderChoiceInput(test, inputArea);
+      } else if (test.type === 'ordering') {
+        renderOrderingInput(test, inputArea);
+      }
+
+      // Se já foi respondido anteriormente, reexibe a escolha
+      if (STATE.results[test.id]) {
+        revealSavedInterpretation(test, STATE.results[test.id]);
+      }
+
+      showView('test');
+    }
+
+    function renderChoiceInput(test, container) {
+      const list = document.createElement('div');
+      list.className = 'grid grid-cols-1 gap-3';
+
+      test.options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left p-4 rounded-2xl border border-stone-200 dark:border-stone-800 hover:border-zen-accent dark:hover:border-zen-accent hover:bg-stone-50 dark:hover:bg-stone-800/60 transition-all flex items-center justify-between group`;
+        
+        btn.innerHTML = `
+          <div class="flex items-center gap-3">
+            ${opt.colorHint ? `<span class="w-4 h-4 rounded-full border border-stone-300 dark:border-stone-700 flex-shrink-0" style="background-color: ${opt.colorHint}"></span>` : ''}
+            ${opt.icon ? `<i data-lucide="${opt.icon}" class="w-4 h-4 text-zen-accent flex-shrink-0"></i>` : ''}
+            <span class="text-sm font-medium text-stone-800 dark:text-stone-200 group-hover:text-zen-accent transition-colors">${opt.label}</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-stone-300 group-hover:text-zen-accent group-hover:translate-x-1 transition-all"></i>
+        `;
+
+        btn.onclick = () => selectChoiceOption(test, opt);
+        list.appendChild(btn);
+      });
+
+      container.appendChild(list);
+    }
+
+    function renderOrderingInput(test, container) {
+      STATE.orderingState = [...test.items];
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'space-y-4';
+
+      const instructions = document.createElement('p');
+      instructions.className = 'text-xs text-stone-500 italic';
+      instructions.innerText = 'Use as setas para ajustar a fila: o do topo será o PRIMEIRO a ser abandonado; o da base será o ÚLTIMO guardado com você.';
+      wrapper.appendChild(instructions);
+
+      const itemsList = document.createElement('div');
+      itemsList.id = 'ordering-list';
+      itemsList.className = 'space-y-2';
+
+      renderOrderingItemsList(itemsList);
+      wrapper.appendChild(itemsList);
+
+      const confirmBtn = document.createElement('button');
+      confirmBtn.className = 'w-full py-3.5 rounded-2xl bg-zen-accent hover:bg-zen-accentHover text-white font-semibold text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-4';
+      confirmBtn.innerHTML = `
+        <i data-lucide="sparkles" class="w-4 h-4"></i>
+        <span>Confirmar Esta Ordem & Decodificar</span>
+      `;
+      confirmBtn.onclick = () => confirmOrderingResult(test);
+      wrapper.appendChild(confirmBtn);
+
+      container.appendChild(wrapper);
+    }
+
+    function renderOrderingItemsList(container) {
+      container.innerHTML = '';
+
+      STATE.orderingState.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700 flex items-center justify-between gap-3';
+
+        const positionLabel = index === 0 
+          ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400">1º Descartado</span>'
+          : index === STATE.orderingState.length - 1
+            ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Último Guardado</span>'
+            : `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300">${index + 1}º Lugar</span>`;
+
+        row.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-xl bg-stone-200 dark:bg-stone-700 flex items-center justify-center text-xs font-bold text-stone-700 dark:text-stone-200">
+              ${index + 1}
+            </span>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-serif font-bold text-sm text-zen-ink dark:text-white">${item.name}</span>
+                ${positionLabel}
+              </div>
+              <span class="text-xs text-stone-500">${item.symbol}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button onclick="moveOrderItem(${index}, -1)" ${index === 0 ? 'disabled class="opacity-20 cursor-not-allowed p-1.5"' : 'class="p-1.5 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-lg text-stone-600 dark:text-stone-300"'} title="Mover para cima">
+              <i data-lucide="arrow-up" class="w-4 h-4"></i>
+            </button>
+            <button onclick="moveOrderItem(${index}, 1)" ${index === STATE.orderingState.length - 1 ? 'disabled class="opacity-20 cursor-not-allowed p-1.5"' : 'class="p-1.5 hover:bg-stone-200 dark:hover:bg-stone-700 rounded-lg text-stone-600 dark:text-stone-300"'} title="Mover para baixo">
+              <i data-lucide="arrow-down" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+      lucide.createIcons();
+    }
+
+    function moveOrderItem(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= STATE.orderingState.length) return;
+      const temp = STATE.orderingState[index];
+      STATE.orderingState[index] = STATE.orderingState[targetIndex];
+      STATE.orderingState[targetIndex] = temp;
+      renderOrderingItemsList(document.getElementById('ordering-list'));
+    }
+
+    function selectChoiceOption(test, option) {
+      // Salva estado
+      STATE.results[test.id] = {
+        type: 'choice',
+        choiceLabel: option.label,
+        resultTitle: option.resultTitle,
+        resultDesc: option.resultDesc,
+        symbolTitle: test.symbolTitle,
+        symbolDesc: test.symbolDesc
+      };
+      saveResultsToStorage();
+
+      revealInterpretationAnimation(test, option.label, option.resultTitle, option.resultDesc);
+      showToast('Escolha gravada no seu Kokoro!');
+    }
+
+    function confirmOrderingResult(test) {
+      const firstDiscarded = STATE.orderingState[0];
+      const lastKept = STATE.orderingState[STATE.orderingState.length - 1];
+
+      const interpretationText = `Você decidiu abandonar primeiro o <strong>${firstDiscarded.name}</strong> (${firstDiscarded.symbol}), revelando que sob forte estresse este é o pilar do qual você abre mão com menor sofrimento. Por outro lado, guardou até o fim o <strong>${lastKept.name}</strong> (${lastKept.symbol}), o qual é seu alicerce existencial inegociável na vida.`;
+
+      STATE.results[test.id] = {
+        type: 'ordering',
+        choiceLabel: `1º: ${firstDiscarded.name} ➔ Guardado: ${lastKept.name}`,
+        resultTitle: `Prioridade Máxima: ${lastKept.name} (${lastKept.symbol})`,
+        resultDesc: interpretationText,
+        symbolTitle: test.symbolTitle,
+        symbolDesc: test.symbolDesc
+      };
+      saveResultsToStorage();
+
+      revealInterpretationAnimation(test, `Fiel guardado: ${lastKept.name}`, `Sua Força: ${lastKept.symbol}`, interpretationText);
+      showToast('Ordem de prioridades decodificada!');
+    }
+
+    function revealInterpretationAnimation(test, userChoice, title, description) {
+      const box = document.getElementById('interpretation-box');
+      document.getElementById('interp-symbol-title').innerText = test.symbolTitle;
+      document.getElementById('interp-symbol-desc').innerText = test.symbolDesc;
+      document.getElementById('user-choice-badge').innerText = userChoice;
+      document.getElementById('interp-choice-title').innerHTML = title;
+      document.getElementById('interp-choice-text').innerHTML = description;
+
+      box.classList.remove('hidden');
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      lucide.createIcons();
+    }
+
+    function revealSavedInterpretation(test, savedResult) {
+      revealInterpretationAnimation(test, savedResult.choiceLabel, savedResult.resultTitle, savedResult.resultDesc);
+    }
+
+    function goToNextTest() {
+      const current = KOKOLOGY_TESTS.find(t => t.id === STATE.currentTestId);
+      if (!current) {
+        showView('home');
+        return;
+      }
+      const nextIndex = KOKOLOGY_TESTS.findIndex(t => t.id === current.id) + 1;
+      if (nextIndex < KOKOLOGY_TESTS.length) {
+        startTest(KOKOLOGY_TESTS[nextIndex].id);
+      } else {
+        showView('profile');
+      }
+    }
+
+    function updateProfileStats() {
+      const completedCount = Object.keys(STATE.results).length;
+      const total = KOKOLOGY_TESTS.length;
+      
+      const badge = document.getElementById('badge-completed');
+      if (badge) badge.innerText = completedCount;
+
+      const progressFill = document.getElementById('progress-bar-fill');
+      if (progressFill) {
+        const pct = Math.round((completedCount / total) * 100);
+        progressFill.style.width = `${pct}%`;
+      }
+
+      const statusText = document.getElementById('profile-status-text');
+      if (statusText) {
+        statusText.innerText = `Você concluiu ${completedCount} de ${total} testes de Kokology.`;
+      }
+    }
+
+    function renderProfileView() {
+      const container = document.getElementById('profile-cards-container');
+      container.innerHTML = '';
+
+      if (Object.keys(STATE.results).length === 0) {
+        container.innerHTML = `
+          <div class="bg-white dark:bg-zen-darkcard rounded-2xl p-8 border border-stone-200 dark:border-stone-800 text-center space-y-3">
+            <i data-lucide="book-open" class="w-8 h-8 text-stone-400 mx-auto"></i>
+            <h4 class="font-serif font-bold text-lg text-zen-ink dark:text-white">Nenhum teste respondido ainda</h4>
+            <p class="text-xs sm:text-sm text-stone-500 max-w-sm mx-auto">
+              Selecione um cenário na tela inicial e responda instintivamente para começar a tecer seu mapa de personalidade.
+            </p>
+            <button onclick="startFirstIncompleteTest()" class="px-5 py-2.5 rounded-xl bg-zen-accent text-white text-xs font-semibold shadow">
+              Iniciar Primeiro Teste
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      KOKOLOGY_TESTS.forEach(test => {
+        const res = STATE.results[test.id];
+        if (!res) return;
+
+        const card = document.createElement('div');
+        card.className = 'bg-white dark:bg-zen-darkcard rounded-2xl p-6 border border-stone-200 dark:border-stone-800 space-y-4 shadow-sm';
+        
+        card.innerHTML = `
+          <div class="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-zen-accent">${test.category}</span>
+              <h4 class="font-serif font-bold text-base sm:text-lg text-zen-ink dark:text-white">${test.order}. ${test.title}</h4>
+            </div>
+            <button onclick="startTest('${test.id}')" class="text-xs font-semibold text-stone-500 hover:text-zen-accent transition-colors">
+              Refazer
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-stone-400">Sua Projeção:</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
+                ${res.choiceLabel}
+              </span>
+            </div>
+            <h5 class="text-sm font-bold text-zen-ink dark:text-stone-100">${res.resultTitle}</h5>
+            <p class="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+              ${res.resultDesc}
+            </p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    // Copiar relatório completo para a área de transferência
+    function copyProfileToClipboard() {
+      const keys = Object.keys(STATE.results);
+      if (keys.length === 0) {
+        showToast('Nenhum teste respondido para copiar.');
+        return;
+      }
+
+      let text = `=== MEU PERFIL KOKOLOGY (心) ===\n\n`;
+      KOKOLOGY_TESTS.forEach(test => {
+        const res = STATE.results[test.id];
+        if (res) {
+          text += `[${test.title.toUpperCase()} - ${test.category}]\n`;
+          text += `Escolha: ${res.choiceLabel}\n`;
+          text += `Análise: ${res.resultTitle}\n`;
+          text += `${res.resultDesc.replace(/<[^>]*>?/gm, '')}\n\n`;
+        }
+      });
+      text += `Kokology: O Espelho da Mente • Isamu Saito & Tadahiko Nagao`;
+
+      const tempInput = document.createElement('textarea');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast('Relatório copiado para a área de transferência!');
+      } catch (err) {
+        showToast('Erro ao copiar relatório.');
+      }
+      document.body.removeChild(tempInput);
+    }
+  </script>
+</body>
+</html>

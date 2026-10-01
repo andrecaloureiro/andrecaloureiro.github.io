@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onde a Alma Floresce — Uma Jornada de Cura e Renascimento</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cormorant Garamond & Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'serif'],
+            sans: ['Montserrat', 'sans-serif'],
+          },
+          colors: {
+            forest: {
+              deep: '#070f0f',
+              night: '#0c1b1c',
+              twilight: '#172e2d',
+              moss: '#2d4b43',
+              glow: '#65a485',
+              gold: '#e9c46a',
+              rose: '#f4a261',
+              dawn: '#e76f51',
+              petal: '#fcd5ce'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbar and smooth transitions */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #081112;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #20413f;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #396f6a;
+    }
+
+    body {
+      background-color: #070f0f;
+      color: #e4ece8;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* Shimmer and ethereal glows */
+    .glow-effect {
+      box-shadow: 0 0 40px rgba(101, 164, 133, 0.25), 0 0 80px rgba(233, 196, 106, 0.15);
+    }
+    .text-glow {
+      text-shadow: 0 0 25px rgba(233, 196, 106, 0.4), 0 0 50px rgba(101, 164, 133, 0.3);
+    }
+    .text-glow-soft {
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Ambient dynamic gradient overlays */
+    .bg-gradient-dynamic {
+      background: radial-gradient(circle at 50% 30%, rgba(23, 46, 45, 0.5) 0%, rgba(7, 15, 15, 0.95) 80%);
+      transition: background 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Floating keyframes */
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1.5deg); }
+    }
+    .animate-float {
+      animation: gentleFloat 7s ease-in-out infinite;
+    }
+
+    /* Pulse for meditative breathing */
+    @keyframes breathePulse {
+      0%, 100% { transform: scale(0.92); opacity: 0.55; }
+      50% { transform: scale(1.35); opacity: 0.95; filter: drop-shadow(0 0 35px rgba(233, 196, 106, 0.8)); }
+    }
+    .breathing-flower {
+      transition: all 4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-forest-glow/30 selection:text-forest-gold">
+
+  <!-- Living Nature Canvas (Forest Silhouettes, Fireflies, Petals, Pollen) -->
+  <canvas id="forestCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+  <!-- Ambient Sky Tint (Changes subtly on scroll to symbolize dawn/rebirth) -->
+  <div id="skyAtmosphere" class="fixed inset-0 w-full h-full pointer-events-none z-0 transition-opacity duration-1000 bg-gradient-to-b from-transparent via-[#091514]/30 to-[#070f0f]/90"></div>
+
+  <!-- Audio & Sound Controller Floating Bar -->
+  <nav class="fixed top-6 right-6 z-50 flex items-center space-x-3 bg-[#0a1817]/70 backdrop-blur-md px-4 py-2 rounded-full border border-forest-glow/20 shadow-lg">
+    <button id="toggleAudioBtn" class="flex items-center space-x-2 text-xs uppercase tracking-widest text-emerald-200/80 hover:text-forest-gold transition-colors duration-300">
+      <i id="audioIcon" data-lucide="volume-x" class="w-4 h-4"></i>
+      <span id="audioText">Ativar Sons da Floresta</span>
+    </button>
+  </nav>
+
+  <!-- Navigation indicator / Chapter progress bar -->
+  <div class="fixed top-0 left-0 w-full h-1 bg-white/5 z-50">
+    <div id="progressBar" class="h-full bg-gradient-to-r from-forest-twilight via-forest-glow to-forest-gold w-0 transition-all duration-200"></div>
+  </div>
+
+  <main class="relative z-10 flex flex-col items-center">
+
+    <section id="chapter1" class="min-h-screen w-full flex flex-col justify-center items-center px-6 text-center max-w-4xl mx-auto pt-20 pb-16">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-400/20 bg-emerald-950/30 text-emerald-300/80 text-xs tracking-widest uppercase mb-6 animate-pulse">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+        <span>Santuário de Acolhimento</span>
+      </div>
+
+      <h1 class="font-serif text-5xl sm:text-7xl md:text-8xl font-light text-stone-100 tracking-tight leading-[1.1] mb-6 text-glow">
+        Toda dor carrega <br>
+        <em class="italic font-normal text-forest-gold">a semente do florescer</em>
+      </h1>
+
+      <p class="font-serif text-xl sm:text-2xl text-stone-300/90 max-w-2xl font-light leading-relaxed mb-10 italic">
+        "No silêncio das raízes mais profundas, a terra nunca esquece como abraçar a tempestade e transformá-la em nova vida."
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <a href="#breathChapter" class="px-8 py-3.5 rounded-full bg-gradient-to-r from-emerald-800/80 to-teal-900/80 hover:from-forest-glow hover:to-emerald-600 text-stone-100 text-sm tracking-widest uppercase transition-all duration-500 border border-emerald-500/30 shadow-lg hover:shadow-emerald-500/20 hover:scale-105 flex items-center gap-2">
+          <span>Respirar na Floresta</span>
+          <i data-lucide="wind" class="w-4 h-4"></i>
+        </a>
+        <a href="#plantMemory" class="px-8 py-3.5 rounded-full bg-stone-900/60 hover:bg-stone-800/80 text-stone-300 hover:text-stone-100 text-sm tracking-widest uppercase transition-all duration-300 border border-stone-700/40">
+          Plantar uma Memória
+        </a>
+      </div>
+
+      <!-- Subtle scroll down hint -->
+      <div class="mt-20 flex flex-col items-center gap-2 text-stone-400/60 animate-bounce">
+        <span class="text-xs uppercase tracking-widest">Role para curar</span>
+        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+      </div>
+    </section>
+
+    <section id="breathChapter" class="min-h-screen w-full flex flex-col justify-center items-center px-6 py-20 relative">
+      <div class="max-w-2xl text-center mb-10">
+        <span class="text-xs uppercase tracking-widest text-emerald-400/80 font-mono">Pausa Consciente</span>
+        <h2 class="font-serif text-4xl sm:text-5xl text-stone-100 mt-2 mb-4 font-normal">
+          O Sopro de Vida
+        </h2>
+        <p class="text-stone-300/80 text-sm sm:text-base font-light leading-relaxed">
+          Você não precisa carregar o peso do mundo neste segundo. Apenas inspire a serenidade e expire aquilo que não mais lhe pertence.
+        </p>
+      </div>
+
+      <!-- Breathing Lotus Interactive SVG Visualization -->
+      <div class="relative flex flex-col items-center justify-center p-8">
+        <div id="breathCircle" class="w-64 h-64 sm:w-80 sm:h-80 rounded-full flex items-center justify-center relative transition-transform duration-[4000ms] ease-in-out">
+          <!-- Multi-layered glowing petals -->
+          <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-emerald-500/20 to-amber-300/10 blur-2xl"></div>
+          
+          <svg class="w-56 h-56 sm:w-72 sm:h-72 breathing-flower" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="lotusGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fdf0d5" stop-opacity="0.9"/>
+                <stop offset="40%" stop-color="#e9c46a" stop-opacity="0.7"/>
+                <stop offset="75%" stop-color="#2a9d8f" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#070f0f" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <!-- Petals rotated organically -->
+            <g id="lotusPetalsGroup">
+              <path d="M100 20 C115 55, 125 75, 100 100 C75 75, 85 55, 100 20Z" fill="url(#lotusGlow)" opacity="0.8"/>
+              <path d="M100 20 C115 55, 125 75, 100 100 C75 75, 85 55, 100 20Z" fill="url(#lotusGlow)" opacity="0.8" transform="rotate(45 100 100)"/>
+              <path d="M100 20 C115 55, 125 75, 100 100 C75 75, 85 55, 100 20Z" fill="url(#lotusGlow)" opacity="0.8" transform="rotate(90 100 100)"/>
+              <path d="M100 20 C115 55, 125 75, 100 100 C75 75, 85 55, 100 20Z" fill="url(#lotusGlow)" opacity="0.8" transform="rotate(135 100 100)"/>
+              <path d="M100 20 C115 55, 125 75, 100 100 C75 75, 85 55, 100 20Z" fill="url(#lotusGlow)" opacity="0.8" transform="rotate(180 100 100)"/>
+              <path d="M100 20 C115 55, 125 75, 100 100 C75 75, 85 55, 100 20Z" fill="url(#lotusGlow)" opacity="0.8" transform="rotate(225 100 100)"/>
+              <path d="M100 20 C115 55, 125 75, 100 100 C75 75, 85 55, 100 20Z" fill="url(#lotusGlow)" opacity="0.8" transform="rotate(270 100 100)"/>
+              <path d="M100 20 C115 55, 125 75, 100 100 C75 75, 85 55, 100 20Z" fill="url(#lotusGlow)" opacity="0.8" transform="rotate(315 100 100)"/>
+            </g>
+            <circle cx="100" cy="100" r="14" fill="#fdf0d5" opacity="0.9" />
+          </svg>
+        </div>
+
+        <div class="mt-8 flex flex-col items-center">
+          <div id="breathInstruction" class="text-2xl font-serif italic text-forest-gold tracking-wide transition-all duration-700 min-h-[36px]">
+            Inspire profundamente...
+          </div>
+          <span id="breathTimer" class="text-xs font-mono uppercase tracking-widest text-stone-400 mt-2">
+            Seguindo o ritmo do coração
+          </span>
+          <button id="toggleBreathBtn" class="mt-6 px-6 py-2 rounded-full border border-forest-glow/30 hover:border-forest-glow text-stone-300 hover:text-stone-100 text-xs uppercase tracking-widest transition-all">
+            Pausar Exercício
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="min-h-screen w-full flex flex-col justify-center items-center px-6 py-24 max-w-5xl">
+      <div class="text-center mb-16">
+        <span class="text-xs uppercase tracking-widest text-emerald-400/80 font-mono">Metamorfose</span>
+        <h2 class="font-serif text-4xl sm:text-6xl text-stone-100 mt-2 mb-4 font-light">
+          As Quatro Estações do Luto
+        </h2>
+        <p class="text-stone-300/80 text-base max-w-xl mx-auto font-light">
+          A natureza não se apressa no inverno para virar primavera. Cada fase do silêncio cumpre seu papel sagrado.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+        <!-- Card 1: O Inverno da Alma -->
+        <div class="group p-8 rounded-2xl bg-[#0e1d1c]/80 backdrop-blur-md border border-stone-800/80 hover:border-emerald-500/40 transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-emerald-950/50">
+          <div class="w-12 h-12 rounded-xl bg-blue-950/50 flex items-center justify-center text-blue-300 mb-6 border border-blue-800/30">
+            <i data-lucide="cloud-rain" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-serif text-2xl text-stone-100 mb-3 group-hover:text-forest-gold transition-colors">1. A Queda e a Névoa</h3>
+          <p class="text-stone-400 text-sm leading-relaxed font-light">
+            Quando as folhas caem, a árvore parece desolada e nua. No entanto, ela não está morta; ela apenas recolhe toda a sua essência para o aconchego mais profundo da terra. Respeite o seu descanso.
+          </p>
+        </div>
+
+        <!-- Card 2: A Germinação no Escuro -->
+        <div class="group p-8 rounded-2xl bg-[#0e1d1c]/80 backdrop-blur-md border border-stone-800/80 hover:border-emerald-500/40 transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-emerald-950/50">
+          <div class="w-12 h-12 rounded-xl bg-emerald-950/50 flex items-center justify-center text-emerald-300 mb-6 border border-emerald-800/30">
+            <i data-lucide="sprout" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-serif text-2xl text-stone-100 mb-3 group-hover:text-forest-gold transition-colors">2. O Silêncio da Semente</h3>
+          <p class="text-stone-400 text-sm leading-relaxed font-light">
+            Para desabrochar, a semente precisa passar pela escuridão absoluta sob o solo. Aquilo que você sente hoje como rompimento é, na verdade, a casca dura se abrindo para acolher a luz.
+          </p>
+        </div>
+
+        <!-- Card 3: O Primeiro Raio de Sol -->
+        <div class="group p-8 rounded-2xl bg-[#0e1d1c]/80 backdrop-blur-md border border-stone-800/80 hover:border-emerald-500/40 transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-emerald-950/50">
+          <div class="w-12 h-12 rounded-xl bg-amber-950/50 flex items-center justify-center text-amber-300 mb-6 border border-amber-800/30">
+            <i data-lucide="sun" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-serif text-2xl text-stone-100 mb-3 group-hover:text-forest-gold transition-colors">3. O Perdão e o Calor</h3>
+          <p class="text-stone-400 text-sm leading-relaxed font-light">
+            O orvalho da manhã reflete os primeiros raios solares. Aceitar que algumas coisas terminam não diminui a beleza que um dia tiveram; liberta-as para se tornarem adubo de novos sonhos.
+          </p>
+        </div>
+
+        <!-- Card 4: O Florescer Infinito -->
+        <div class="group p-8 rounded-2xl bg-[#0e1d1c]/80 backdrop-blur-md border border-stone-800/80 hover:border-emerald-500/40 transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-emerald-950/50">
+          <div class="w-12 h-12 rounded-xl bg-rose-950/50 flex items-center justify-center text-rose-300 mb-6 border border-rose-800/30">
+            <i data-lucide="flower" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-serif text-2xl text-stone-100 mb-3 group-hover:text-forest-gold transition-colors">4. O Renascer Pleno</h3>
+          <p class="text-stone-400 text-sm leading-relaxed font-light">
+            Florescer não é esquecer a tempestade, mas carregar suas marcas como pétalas que agora conhecem a própria força. Você é mais resistente do que imagina.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="plantMemory" class="min-h-screen w-full flex flex-col justify-center items-center px-6 py-20">
+      <div class="w-full max-w-2xl bg-[#0d1e1d]/90 backdrop-blur-xl p-8 sm:p-12 rounded-3xl border border-emerald-500/20 shadow-2xl relative overflow-hidden">
+        
+        <!-- Soft decorative foliage aura -->
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-forest-glow/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-forest-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="text-center relative z-10">
+          <span class="text-xs uppercase tracking-widest text-emerald-400 font-mono">Cerimônia Simbólica</span>
+          <h2 class="font-serif text-3xl sm:text-5xl text-stone-100 mt-2 mb-3">
+            Plante uma Memória
+          </h2>
+          <p class="text-stone-300/80 text-sm font-light mb-8">
+            Escreva o que você precisa honrar, perdoar ou deixar ir. Ao enviar, uma nova flor cósmica nascerá na floresta para guardar sua intenção com carinho.
+          </p>
+
+          <form id="memoryForm" class="space-y-4">
+            <div class="relative">
+              <textarea id="memoryInput" rows="3" required placeholder="Ex: Eu perdoo a mim mesmo por não ter sabido fazer diferente... ou Em memória do amor que sempre viverá em mim." class="w-full bg-[#071212]/80 border border-emerald-900/60 focus:border-forest-glow/80 rounded-2xl p-4 text-stone-200 placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-forest-glow transition-all text-sm resize-none"></textarea>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+              <div class="flex items-center space-x-2 text-stone-400 text-xs">
+                <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>Gesto anônimo e íntimo</span>
+              </div>
+              <button type="submit" class="w-full sm:w-auto px-8 py-3 rounded-full bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-stone-100 text-xs uppercase tracking-widest font-medium transition-all shadow-lg hover:shadow-emerald-500/25 flex items-center justify-center gap-2">
+                <span>Fazer Florescer</span>
+                <i data-lucide="sparkle" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </form>
+
+          <!-- Success Affirmation Modal/Banner -->
+          <div id="memorySuccess" class="hidden mt-6 p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-200 text-sm animate-fade-in">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <i data-lucide="heart" class="w-4 h-4 text-rose-400 fill-rose-400"></i>
+              <span class="font-serif italic text-base text-forest-gold">Sua flor foi plantada com amor.</span>
+            </div>
+            <p class="text-xs text-stone-300 font-light">Olhe os vaga-lumes e pétalas ao seu redor dançando em celebração à sua libertação.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="min-h-screen w-full flex flex-col justify-center items-center px-6 py-24 max-w-6xl">
+      <div class="text-center mb-16">
+        <span class="text-xs uppercase tracking-widest text-emerald-400/80 font-mono">Reflexões da Floresta</span>
+        <h2 class="font-serif text-4xl sm:text-6xl text-stone-100 mt-2 mb-4 font-light">
+          O Jardim das Almas
+        </h2>
+        <p class="text-stone-300/80 text-sm sm:text-base max-w-xl mx-auto font-light">
+          Toque nas flores para colher um sussurro de coragem deixado por aqueles que também atravessaram o escuro.
+        </p>
+      </div>
+
+      <div id="gardenGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+        <!-- Dynamic petals populated by JavaScript -->
+      </div>
+    </section>
+
+    <footer class="w-full py-20 border-t border-emerald-950/80 text-center px-6 relative z-10 bg-gradient-to-t from-[#0a1514] to-transparent">
+      <div class="max-w-2xl mx-auto space-y-6">
+        <i data-lucide="flower-2" class="w-8 h-8 text-forest-gold mx-auto animate-float"></i>
+        <h3 class="font-serif text-3xl text-stone-200 font-light">
+          A manhã sempre chega.
+        </h3>
+        <p class="text-stone-400 text-xs sm:text-sm font-light leading-relaxed">
+          Que a sua caminhada seja leve, e que o tempo ensine o seu coração a acolher cada estação sem medo do desabrochar.
+        </p>
+        <div class="pt-6 text-stone-500 text-[11px] tracking-widest uppercase">
+          Feito com delicadeza para confortar o seu coração
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    /* =========================================================
+       1. GENERATIVE WEB AUDIO API (Harmonic Forest Chimes & Wind)
+       ========================================================= */
+    let audioCtx = null;
+    let isAudioPlaying = false;
+    let masterGain = null;
+    let windOsc = null;
+    let windGain = null;
+
+    // Pentatonic frequencies in Hz (soft ethereal scale in F# major / D# minor)
+    const CHIME_FREQS = [277.18, 329.63, 369.99, 440.00, 493.88, 554.37, 659.25, 739.99, 880.00];
+
+    function initAudio() {
+      if (audioCtx) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        masterGain.connect(audioCtx.destination);
+
+        // Soft ambient pink noise filter simulation for gentle forest breeze
+        createForestBreeze();
+      } catch (e) {
+        console.warn("Web Audio API not supported", e);
+      }
+    }
+
+    function createForestBreeze() {
+      if (!audioCtx) return;
+      const bufferSize = audioCtx.sampleRate * 2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0;
+
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99 * b0 + white * 0.05;
+        b1 = 0.96 * b1 + white * 0.08;
+        b2 = 0.86 * b2 + white * 0.15;
+        output[i] = (b0 + b1 + b2) * 0.05;
+      }
+
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(450, audioCtx.currentTime);
+
+      windGain = audioCtx.createGain();
+      windGain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+
+      whiteNoise.connect(filter);
+      filter.connect(windGain);
+      windGain.connect(masterGain);
+      whiteNoise.start();
+    }
+
+    function playSoftChime(freq = null) {
+      if (!audioCtx || !isAudioPlaying) return;
+      const targetFreq = freq || CHIME_FREQS[Math.floor(Math.random() * CHIME_FREQS.length)];
+      
+      const osc = audioCtx.createOscillator();
+      const noteGain = audioCtx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(targetFreq, audioCtx.currentTime);
+
+      const now = audioCtx.currentTime;
+      noteGain.gain.setValueAtTime(0.001, now);
+      noteGain.gain.exponentialRampToValueAtTime(0.08, now + 0.15);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.5);
+
+      osc.connect(noteGain);
+      noteGain.connect(masterGain);
+
+      osc.start(now);
+      osc.stop(now + 3.6);
+    }
+
+    // Toggle audio state
+    const toggleAudioBtn = document.getElementById('toggleAudioBtn');
+    const audioIcon = document.getElementById('audioIcon');
+    const audioText = document.getElementById('audioText');
+
+    toggleAudioBtn.addEventListener('click', () => {
+      initAudio();
+      if (!audioCtx) return;
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      isAudioPlaying = !isAudioPlaying;
+      if (isAudioPlaying) {
+        masterGain.gain.setTargetAtTime(0.4, audioCtx.currentTime, 0.5);
+        audioText.textContent = "Sons Ativos";
+        audioIcon.setAttribute('data-lucide', 'volume-2');
+        playSoftChime(440);
+        // Start periodic gentle chimes
+        startAmbientMelody();
+      } else {
+        masterGain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.5);
+        audioText.textContent = "Ativar Sons";
+        audioIcon.setAttribute('data-lucide', 'volume-x');
+      }
+      lucide.createIcons();
+    });
+
+    let ambientInterval = null;
+    function startAmbientMelody() {
+      if (ambientInterval) clearInterval(ambientInterval);
+      ambientInterval = setInterval(() => {
+        if (isAudioPlaying && Math.random() > 0.4) {
+          playSoftChime();
+        }
+      }, 3500);
+    }
+
+    /* =========================================================
+       2. CANVAS ANIMATION ENGINE (LIVING FOREST & FIREFLIES)
+       ========================================================= */
+    const canvas = document.getElementById('forestCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      generateSilhouettes();
+    });
+
+    // Mouse interactive tracker for gentle wind deflection
+    const mouse = { x: width / 2, y: height / 2, speed: 0 };
+    let lastMouseX = width / 2;
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.speed = Math.abs(e.clientX - lastMouseX);
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      lastMouseX = e.clientX;
+      if (Math.random() < 0.05) playSoftChime();
+    });
+
+    // Particle Classes: Fireflies & Falling Sakura/Petals
+    class Firefly {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 2 + 1.2;
+        this.vx = (Math.random() - 0.5) * 0.6;
+        this.vy = (Math.random() - 0.5) * 0.6;
+        this.alpha = Math.random() * 0.6 + 0.2;
+        this.pulseSpeed = Math.random() * 0.03 + 0.01;
+        this.color = Math.random() > 0.3 ? '233, 196, 106' : '101, 164, 133';
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha += Math.sin(Date.now() * this.pulseSpeed) * 0.015;
+
+        // Attracted or deflected softly by mouse
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+          this.x -= (dx / dist) * 0.8;
+          this.y -= (dy / dist) * 0.8;
+        }
+
+        if (this.x < 0) this.x = width;
+        if (this.x > width) this.x = 0;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
+      }
+      draw() {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${this.color}, ${Math.max(0.1, Math.min(0.9, this.alpha))})`;
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = `rgba(${this.color}, 0.8)`;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class Petal {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = -20;
+        this.size = Math.random() * 6 + 4;
+        this.vy = Math.random() * 1 + 0.6;
+        this.vx = Math.sin(Math.random() * Math.PI) * 0.7;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.03;
+        this.hue = Math.random() > 0.5 ? '#fcd5ce' : '#f8edeb';
+      }
+      update() {
+        this.y += this.vy;
+        this.x += this.vx + Math.sin(this.y * 0.01) * 0.5;
+        this.rotation += this.rotationSpeed;
+
+        if (this.y > height + 20) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.beginPath();
+        // Organic leaf/petal shape
+        ctx.moveTo(0, -this.size);
+        ctx.bezierCurveTo(this.size * 0.8, -this.size * 0.5, this.size * 0.8, this.size * 0.5, 0, this.size);
+        ctx.bezierCurveTo(-this.size * 0.8, this.size * 0.5, -this.size * 0.8, -this.size * 0.5, 0, -this.size);
+        ctx.fillStyle = this.hue;
+        ctx.globalAlpha = 0.45;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    let trees = [];
+    function generateSilhouettes() {
+      trees = [];
+      const numTrees = Math.floor(width / 70);
+      for (let i = 0; i <= numTrees; i++) {
+        trees.push({
+          x: i * 75 + (Math.random() - 0.5) * 30,
+          h: Math.random() * (height * 0.4) + height * 0.35,
+          branchWidth: Math.random() * 12 + 10,
+          curve: (Math.random() - 0.5) * 40
+        });
+      }
+    }
+
+    // Initialize fireflies and petals pools
+    const fireflies = Array.from({ length: 45 }, () => new Firefly());
+    const petals = Array.from({ length: 30 }, () => new Petal());
+    generateSilhouettes();
+
+    // Scroll progress color temperature shift
+    let scrollProgress = 0;
+    const skyAtmosphere = document.getElementById('skyAtmosphere');
+    const progressBar = document.getElementById('progressBar');
+
+    window.addEventListener('scroll', () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      scrollProgress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      progressBar.style.width = `${scrollProgress * 100}%`;
+
+      // Transform sky hue from midnight cold towards warm sunrise
+      const warmR = Math.floor(7 + scrollProgress * 25);
+      const warmG = Math.floor(15 + scrollProgress * 30);
+      const warmB = Math.floor(15 + scrollProgress * 15);
+      skyAtmosphere.style.backgroundColor = `rgba(${warmR}, ${warmG}, ${warmB}, ${0.2 + scrollProgress * 0.3})`;
+    });
+
+    // Render loop
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw faint distant forest silhouettes at bottom
+      ctx.save();
+      ctx.fillStyle = 'rgba(4, 11, 11, 0.85)';
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      trees.forEach((t) => {
+        ctx.quadraticCurveTo(t.x + t.curve * 0.5, height - t.h * 0.6, t.x, height - t.h);
+        ctx.quadraticCurveTo(t.x - t.curve * 0.5, height - t.h * 0.4, t.x + t.branchWidth, height);
+      });
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // Update and draw petals
+      petals.forEach((petal) => {
+        petal.update();
+        petal.draw();
+      });
+
+      // Update and draw fireflies
+      fireflies.forEach((firefly) => {
+        firefly.update();
+        firefly.draw();
+      });
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* =========================================================
+       3. GUIDED BREATHING EXERCISE LOGIC
+       ========================================================= */
+    const breathCircle = document.getElementById('breathCircle');
+    const breathInstruction = document.getElementById('breathInstruction');
+    const breathTimer = document.getElementById('breathTimer');
+    const toggleBreathBtn = document.getElementById('toggleBreathBtn');
+
+    let breathPhase = 0; // 0: Inhale, 1: Hold, 2: Exhale
+    let breathActive = true;
+    let breathInterval = null;
+
+    const phases = [
+      { text: "Inspire lentamente... acolhendo a vida", time: 4000, scale: "scale-125" },
+      { text: "Segure o ar... sinta a paz no peito", time: 3000, scale: "scale-125" },
+      { text: "Expire com carinho... solte a tensão", time: 5000, scale: "scale-90" }
+    ];
+
+    function runBreathingStep() {
+      if (!breathActive) return;
+      const current = phases[breathPhase];
+      breathInstruction.textContent = current.text;
+      breathCircle.className = `w-64 h-64 sm:w-80 sm:h-80 rounded-full flex items-center justify-center relative transition-transform duration-[4000ms] ease-in-out ${current.scale}`;
+
+      if (breathPhase === 0 && isAudioPlaying) {
+        playSoftChime(329.63);
+      }
+
+      breathInterval = setTimeout(() => {
+        breathPhase = (breathPhase + 1) % phases.length;
+        runBreathingStep();
+      }, current.time);
+    }
+
+    runBreathingStep();
+
+    toggleBreathBtn.addEventListener('click', () => {
+      breathActive = !breathActive;
+      if (breathActive) {
+        toggleBreathBtn.textContent = "Pausar Exercício";
+        runBreathingStep();
+      } else {
+        clearTimeout(breathInterval);
+        toggleBreathBtn.textContent = "Retomar Exercício";
+        breathInstruction.textContent = "Em repouso sereno";
+      }
+    });
+
+    /* =========================================================
+       4. 'PLANTE UMA MEMÓRIA' INTERACTIVITY
+       ========================================================= */
+    const memoryForm = document.getElementById('memoryForm');
+    const memoryInput = document.getElementById('memoryInput');
+    const memorySuccess = document.getElementById('memorySuccess');
+
+    memoryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = memoryInput.value.trim();
+      if (!text) return;
+
+      // Burst extra fireflies from center
+      for (let i = 0; i < 15; i++) {
+        const ff = new Firefly();
+        ff.x = width / 2;
+        ff.y = height / 2;
+        ff.vx = (Math.random() - 0.5) * 5;
+        ff.vy = (Math.random() - 0.5) * 5;
+        fireflies.push(ff);
+      }
+
+      // Add user memory dynamically to the Garden of Souls
+      addSoulFlower({
+        quote: `"${text}"`,
+        author: "Plantado por um coração em renascimento",
+        bloomed: true
+      });
+
+      // Play blooming chime chord
+      if (isAudioPlaying) {
+        setTimeout(() => playSoftChime(440), 100);
+        setTimeout(() => playSoftChime(554.37), 300);
+        setTimeout(() => playSoftChime(659.25), 550);
+      }
+
+      memoryInput.value = '';
+      memorySuccess.classList.remove('hidden');
+      setTimeout(() => {
+        memorySuccess.classList.add('hidden');
+      }, 8000);
+    });
+
+    /* =========================================================
+       5. JARDIM DAS ALMAS (SOUL GARDEN DATA & INTERACTION)
+       ========================================================= */
+    const initialSouls = [
+      {
+        quote: "O que a lagarta chama de fim de mundo, o mestre chama de borboleta.",
+        author: "Lao Tsé"
+      },
+      {
+        quote: "Existe uma fresta em todas as coisas; é por ela que a luz entra.",
+        author: "Leonard Cohen"
+      },
+      {
+        quote: "Perdoar não é esquecer o passado, é abrir mão da esperança de que ele pudesse ter sido diferente.",
+        author: "Acolhimento da Alma"
+      },
+      {
+        quote: "Você sobreviveu a todos os seus dias mais difíceis até aqui. Você florescerá de novo.",
+        author: "Sussurro da Floresta"
+      },
+      {
+        quote: "Honre as raízes que suportaram o vendaval. Elas são a sua maior sabedoria.",
+        author: "Guardião das Folhas"
+      },
+      {
+        quote: "Aqueça a sua dor com paciência. As pétalas não abrem à força.",
+        author: "Sabedoria Zen"
+      }
+    ];
+
+    const gardenGrid = document.getElementById('gardenGrid');
+
+    function createSoulCardElement(soul) {
+      const card = document.createElement('div');
+      card.className = "group relative p-8 rounded-3xl bg-[#0c1b1c]/80 backdrop-blur-md border border-stone-800/80 hover:border-emerald-500/50 transition-all duration-500 hover:-translate-y-2 cursor-pointer shadow-lg hover:shadow-emerald-900/40 flex flex-col justify-between overflow-hidden";
+
+      card.innerHTML = `
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-forest-glow/10 rounded-full blur-2xl group-hover:bg-forest-gold/20 transition-colors"></div>
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="p-2 rounded-full bg-emerald-950/60 text-forest-gold border border-emerald-800/40 group-hover:rotate-45 transition-transform duration-700">
+              <i data-lucide="flower" class="w-4 h-4"></i>
+            </span>
+            <span class="text-[10px] uppercase tracking-widest text-emerald-300/60 font-mono">Pétala Viva</span>
+          </div>
+          <p class="font-serif italic text-lg sm:text-xl text-stone-200 group-hover:text-amber-100 transition-colors leading-relaxed mb-6 font-light">
+            ${soul.quote}
+          </p>
+        </div>
+        <div class="pt-4 border-t border-stone-800/60 flex items-center justify-between text-xs text-stone-400">
+          <span class="font-light">${soul.author}</span>
+          <span class="text-emerald-400/80 group-hover:translate-x-1 transition-transform">Toque para ouvir</span>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        playSoftChime();
+        card.classList.add('ring-2', 'ring-forest-gold/60');
+        setTimeout(() => card.classList.remove('ring-2', 'ring-forest-gold/60'), 700);
+      });
+
+      return card;
+    }
+
+    function addSoulFlower(soul) {
+      const el = createSoulCardElement(soul);
+      gardenGrid.prepend(el);
+      lucide.createIcons();
+    }
+
+    // Populate initial soul garden
+    initialSouls.forEach(soul => gardenGrid.appendChild(createSoulCardElement(soul)));
+
+    // Initialize Lucide icons on document ready
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
