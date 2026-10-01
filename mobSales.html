@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Tratado Reservado de Opções & Gestão de Risco | Consultoria</title>
+  
+  <!-- Google Fonts: EB Garamond, Cinzel, Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,700;1,600;1,700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Confetti Canvas Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --parchment-base: #f6eedb;
+      --parchment-dark: #e5d5b7;
+      --ink-primary: #211710;
+      --ink-secondary: #4a3625;
+      --ink-muted: #78624c;
+      --gold-foil: #c59b3f;
+      --gold-dark: #82631d;
+      --wax-red: #8b1d1d;
+    }
+
+    body {
+      background-color: #120e0a;
+      background-image: 
+        radial-gradient(circle at 50% 20%, #291d14 0%, #110d0a 80%),
+        radial-gradient(circle at 10% 90%, rgba(197, 155, 63, 0.08) 0%, transparent 40%);
+      color: var(--ink-primary);
+      font-family: 'EB Garamond', Georgia, serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: text;
+    }
+
+    /* Paper texture generated with layered gradients and vintage vignettes */
+    .parchment-sheet {
+      background-color: var(--parchment-base);
+      background-image: 
+        radial-gradient(ellipse at 50% 0%, rgba(255, 252, 240, 0.8) 0%, transparent 70%),
+        radial-gradient(circle at 5% 30%, rgba(197, 155, 63, 0.12) 0%, transparent 35%),
+        radial-gradient(circle at 95% 75%, rgba(130, 99, 29, 0.12) 0%, transparent 40%),
+        linear-gradient(135deg, rgba(230, 212, 179, 0.6) 0%, rgba(246, 238, 219, 0.3) 100%);
+      box-shadow: 
+        inset 0 0 60px rgba(85, 54, 25, 0.22),
+        0 25px 60px rgba(0, 0, 0, 0.65);
+    }
+
+    /* Classical double-line engraved border */
+    .engraved-frame {
+      border: 2px solid var(--gold-dark);
+      outline: 1px solid rgba(197, 155, 63, 0.45);
+      outline-offset: -6px;
+    }
+
+    /* Traditional drop capital */
+    .drop-capital::first-letter {
+      font-family: 'Cinzel Decorative', serif;
+      float: left;
+      font-size: 3.8rem;
+      line-height: 0.82;
+      padding-top: 5px;
+      padding-right: 10px;
+      padding-left: 2px;
+      color: var(--wax-red);
+      text-shadow: 1px 1px 0px rgba(0,0,0,0.18);
+    }
+
+    /* Touch Canvas overlay */
+    #rippleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 50;
+      mix-blend-mode: multiply;
+    }
+
+    /* Wax seal button styling */
+    .wax-seal {
+      background: radial-gradient(circle at 35% 35%, #ba3030 0%, #7e1717 65%, #4a0d0d 100%);
+      box-shadow: 
+        0 6px 16px rgba(0,0,0,0.45), 
+        inset 1px 1px 3px rgba(255,255,255,0.4),
+        inset -2px -2px 5px rgba(0,0,0,0.6);
+      transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .wax-seal:active {
+      transform: scale(0.92) rotate(-3deg);
+    }
+
+    /* Range slider custom styling */
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 24px;
+      width: 24px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f9df9c 0%, #c59b3f 100%);
+      border: 2px solid #5a4113;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      cursor: pointer;
+      margin-top: -8px;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 8px;
+      cursor: pointer;
+      background: #cfbe9b;
+      border-radius: 4px;
+      border: 1px solid #9c845b;
+    }
+
+    /* Floating coin dopamine particle */
+    .gold-particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 60;
+      font-size: 1.25rem;
+      animation: coinFly 0.85s ease-out forwards;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+    @keyframes coinFly {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.6) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -100px) scale(1.3) rotate(35deg);
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start pb-12 overflow-x-hidden">
+
+  <!-- Interactive Ripple Canvas (60FPS liquid ink simulation) -->
+  <canvas id="rippleCanvas"></canvas>
+
+  <header class="fixed top-0 left-0 right-0 z-40 bg-[#19120c]/90 backdrop-blur-md border-b border-[#a37f37]/40 px-3 py-2 text-white">
+    <div class="max-w-xl mx-auto flex items-center justify-between text-xs font-serif">
+      
+      <!-- Current player rank & visual indicator -->
+      <div class="flex items-center gap-2">
+        <span class="relative flex h-2.5 w-2.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+        </span>
+        <span class="text-[#e2ca9b] uppercase tracking-wider text-[11px] font-semibold" id="rankBadge">
+          Nível: Curioso
+        </span>
+      </div>
+
+      <!-- Live slots countdown & Audio button -->
+      <div class="flex items-center gap-2">
+        <span class="text-[#f1dec1] text-[11px] font-sans bg-[#3b2a1a] px-2 py-0.5 rounded border border-[#6b4e2f]">
+          Restam <strong class="text-amber-400 font-bold" id="remainingSpots">3 vagas</strong>
+        </span>
+        <button id="soundToggle" class="bg-[#2d2015] border border-[#715433] rounded px-2 py-0.5 text-[11px] text-[#f4e2c6] active:scale-95 transition-all">
+          <span id="soundIcon">🔇</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Reading Progress Bar -->
+    <div class="w-full bg-[#2a1c12] h-1.5 mt-2 rounded-full overflow-hidden border border-[#523c28]">
+      <div id="readingProgress" class="h-full bg-gradient-to-r from-[#9e762c] via-[#e5bd68] to-[#f4d48a] w-[5%] transition-all duration-150"></div>
+    </div>
+  </header>
+
+  <main class="w-full max-w-xl mx-auto px-3 sm:px-4 mt-16 relative">
+    
+    <article class="parchment-sheet engraved-frame rounded-lg p-5 sm:p-8 relative transition-all">
+      
+      <!-- Top classical header block -->
+      <div class="text-center border-b border-[#c29f63]/70 pb-5 mb-6">
+        <div class="inline-flex items-center gap-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-[#745532] mb-2 font-['Cinzel']">
+          <span>✠ Instrução Reservada ✠</span>
+          <span>•</span>
+          <span>Protocolo Prático de Derivativos</span>
+        </div>
+        
+        <h1 class="font-['Playfair_Display'] text-2xl sm:text-3xl font-black text-[#21160e] tracking-tight leading-snug">
+          O Segredo da Carteira Autossustentável: Como Destravar Renda Recorrente e Proteção com Opções
+        </h1>
+        
+        <p class="font-serif italic text-sm sm:text-base text-[#574332] mt-2.5 max-w-md mx-auto leading-relaxed">
+          Sem alavancagem de cassino, sem ficar refém de gráficos e com acompanhamento estratégico direto durante 30 dias.
+        </p>
+
+        <div class="flex items-center justify-center gap-3 mt-4 text-[#8a6828]">
+          <div class="h-px bg-[#c29f63] flex-1"></div>
+          <span class="text-xs uppercase tracking-widest font-['Cinzel'] font-bold">Acompanhamento Individual • Resposta em 48h</span>
+          <div class="h-px bg-[#c29f63] flex-1"></div>
+        </div>
+      </div>
+
+      <!-- Salutation -->
+      <p class="font-bold text-base sm:text-lg mb-4 text-[#261a11]">
+        Prezado Investidor e Guardião do Seu Capital,
+      </p>
+
+      <p class="drop-capital text-base sm:text-lg leading-relaxed text-[#2f2218] mb-5 text-justify">
+        Se você mantém ações e fundos na sua carteira apenas esperando passivamente que o mercado suba por pura sorte, você está ignorando a mais sofisticada engrenagem de geração de fluxo de caixa criada pelo mercado financeiro.
+      </p>
+
+      <p class="text-base sm:text-lg leading-relaxed text-[#2f2218] mb-5 text-justify">
+        A grande maioria dos investidores foge das opções porque foi ensinada que derivativos são "armas de destruição em massa". A verdade nua e crua é que as tesourarias dos grandes bancos adoram essa ignorância: <strong>eles compram proteção barata de investidores assustados e embolsam prêmios todos os meses às suas custas</strong>.
+      </p>
+
+      <!-- Quote callout -->
+      <div class="my-6 p-4 sm:p-5 bg-[#eddcc1]/60 border-l-4 border-[#8b1d1d] rounded-r shadow-sm">
+        <p class="font-serif italic text-base sm:text-lg text-[#3a281a] leading-relaxed">
+          &ldquo;O especulador ingênuo usa opções para apostar seu patrimônio na sorte. O financista sábio usa opções para ser o dono do cassino e receber aluguel perpétuo sobre suas próprias ações.&rdquo;
+        </p>
+        <span class="block text-right text-xs font-bold text-[#8b1d1d] mt-2 font-['Cinzel'] uppercase tracking-wider">
+          — Princípio da Assimetria Positiva
+        </span>
+      </div>
+
+      <section class="my-8 bg-[#f0e3cc] border-2 border-[#bfa063] rounded-lg p-4 sm:p-6 shadow-md relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#8b1d1d] text-[#faedd8] font-['Cinzel'] text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
+          Simulador de Destravamento de Caixa
+        </div>
+
+        <h3 class="font-['Cinzel'] text-center text-sm sm:text-base font-bold text-[#2b1e15] mt-1 mb-1">
+          Quanto sua Carteira Pode Gerar com Venda Coberta?
+        </h3>
+        <p class="text-xs text-center text-[#69533f] mb-4 font-serif">
+          Arraste o cursor abaixo para calcular a renda potencial mensal com estratégias defensivas:
+        </p>
+
+        <!-- Slider -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-xs font-bold text-[#3d2b1c] font-sans">
+            <span>Patrimônio em Ações:</span>
+            <span class="text-base text-[#8b1d1d] font-serif font-black" id="portfolioDisplay">R$ 50.000</span>
+          </div>
+          <input 
+            type="range" 
+            id="portfolioRange" 
+            min="10000" 
+            max="500000" 
+            step="5000" 
+            value="50000" 
+            class="w-full h-2 rounded-lg appearance-none cursor-pointer"
+          >
+          <div class="flex justify-between text-[10px] text-[#7d654f] font-sans">
+            <span>R$ 10.000</span>
+            <span>R$ 250.000</span>
+            <span>R$ 500.000</span>
+          </div>
+        </div>
+
+        <!-- Calculated Metrics Grid -->
+        <div class="grid grid-cols-2 gap-3 mt-5">
+          <div class="bg-[#f9f2e4] border border-[#d2bea0] p-3 rounded text-center">
+            <span class="text-[10px] uppercase font-['Cinzel'] tracking-wider text-[#6b523e] block">Renda Estimada (1,5% a.m.)</span>
+            <span class="font-['Playfair_Display'] text-lg sm:text-xl font-black text-[#1b6b2f] block mt-0.5" id="monthlyYieldDisplay">
+              + R$ 750 / mês
+            </span>
+            <span class="text-[9px] text-[#806852] font-serif">sem vender suas ações</span>
+          </div>
+
+          <div class="bg-[#f9f2e4] border border-[#d2bea0] p-3 rounded text-center">
+            <span class="text-[10px] uppercase font-['Cinzel'] tracking-wider text-[#6b523e] block">Nível de Blindagem</span>
+            <span class="font-['Cinzel'] text-xs sm:text-sm font-bold text-[#8b1d1d] block mt-1" id="hedgeLevelDisplay">
+              🛡️ Cobertura Ativa
+            </span>
+            <span class="text-[9px] text-[#806852] font-serif">Proteção contra quedas</span>
+          </div>
+        </div>
+      </section>
+
+      <h2 class="font-['Cinzel'] text-lg sm:text-xl font-bold text-[#23170e] mt-7 mb-4 text-center uppercase tracking-wide">
+        O Que Você Recebe na Consultoria Prática (1 Mês):
+      </h2>
+
+      <div class="space-y-3.5 mb-7 text-sm sm:text-base text-[#342418]">
+        <div class="flex items-start gap-3 bg-[#ede0c8]/60 p-3 rounded border border-[#dac7a5]">
+          <span class="text-[#8b1d1d] font-bold text-lg leading-none mt-0.5">✦</span>
+          <div>
+            <strong class="text-[#1a110a] block font-semibold">1. Raio-X & Estruturação Personalizada da Sua Carteira</strong>
+            <span class="text-xs sm:text-sm text-[#523d2b] leading-relaxed">Análise minuciosa dos papéis que você já possui para apontar exatamente onde é seguro monetizar com venda coberta de CALLs e onde comprar ações com desconto via PUTs.</span>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3 bg-[#ede0c8]/60 p-3 rounded border border-[#dac7a5]">
+          <span class="text-[#8b1d1d] font-bold text-lg leading-none mt-0.5">✦</span>
+          <div>
+            <strong class="text-[#1a110a] block font-semibold">2. Comunicação Semanal Direta & Ajustes de Rota</strong>
+            <span class="text-xs sm:text-sm text-[#523d2b] leading-relaxed">Toda semana você recebe direcionamentos claros: quando manter, quando realizar o lucro da rolagem ou quando fechar operações sem dor de cabeça.</span>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3 bg-[#ede0c8]/60 p-3 rounded border border-[#dac7a5]">
+          <span class="text-[#8b1d1d] font-bold text-lg leading-none mt-0.5">✦</span>
+          <div>
+            <strong class="text-[#1a110a] block font-semibold">3. Suporte Contínuo com Resposta em até 48 Horas</strong>
+            <span class="text-xs sm:text-sm text-[#523d2b] leading-relaxed">Você nunca mais executará uma ordem com dúvida. Tem pergunta sobre strike, corretagem ou margem? Você tem canal aberto para tirar todas as dúvidas em até 48 horas úteis.</span>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3 bg-[#ede0c8]/60 p-3 rounded border border-[#dac7a5]">
+          <span class="text-[#8b1d1d] font-bold text-lg leading-none mt-0.5">✦</span>
+          <div>
+            <strong class="text-[#1a110a] block font-semibold">4. Gerenciamento Antirruína Inegociável</strong>
+            <span class="text-xs sm:text-sm text-[#523d2b] leading-relaxed">Aprenda de forma definitiva a dimensionar o lote de opções para jamais ser exercido além do planejado e eliminar completamente o risco de ruína patrimonial.</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="mt-8 mb-6 border-2 border-[#b8954f] bg-[#fbf5e9] p-5 sm:p-7 rounded-lg shadow-lg relative text-center">
+        
+        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#8b1d1d] text-[#faebd4] text-[10px] font-['Cinzel'] font-bold px-4 py-0.5 rounded-full uppercase tracking-widest shadow border border-[#dfb36a]">
+          Vagas por Ciclo Mensal
+        </div>
+
+        <span class="text-xs font-['Cinzel'] uppercase tracking-widest text-[#785b3b] font-semibold block mt-1">
+          Acesso Completo de 30 Dias
+        </span>
+
+        <h3 class="font-['Playfair_Display'] text-xl sm:text-2xl font-bold text-[#24170e] mt-1 mb-2">
+          Consultoria Individual em Opções & Carteira
+        </h3>
+
+        <div class="flex items-center justify-center gap-3 my-3">
+          <span class="text-sm line-through text-[#8e755f]">De R$ 297,00</span>
+          <span class="font-['Cinzel'] text-4xl sm:text-5xl font-black text-[#8b1d1d]">
+            R$ 97,00
+          </span>
+          <span class="text-xs text-[#523d2d] font-serif self-end pb-1">pagamento único</span>
+        </div>
+
+        <p class="text-xs text-[#634d38] max-w-sm mx-auto mb-5 leading-normal">
+          Menos que o prêmio de uma única venda coberta bem posicionada para destravar a segurança dos seus próximos anos de investimento.
+        </p>
+
+        <!-- CTA Magnetic Button -->
+        <button 
+          id="mainCtaButton" 
+          class="w-full relative group overflow-hidden bg-gradient-to-b from-[#a32222] via-[#851616] to-[#590e0e] text-[#fbf0dc] font-['Cinzel'] font-bold text-base sm:text-lg py-4 px-6 rounded shadow-xl border border-[#d6a55e] active:scale-[0.98] transition-all"
+        >
+          <span class="relative z-10 flex items-center justify-center gap-2 tracking-wider">
+            <span>DESTRAVAR MINHA CONSULTORIA AGORA</span>
+            <span class="text-xl">➔</span>
+          </span>
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+        </button>
+
+        <div class="flex items-center justify-center gap-2 mt-3 text-[11px] text-[#6d543e]">
+          <span>⚡ Resposta em até 48h</span>
+          <span>•</span>
+          <span>📅 1 Mês de Acompanhamento</span>
+          <span>•</span>
+          <span>🔒 Vagas Restritas</span>
+        </div>
+      </section>
+
+      <div class="flex flex-col items-center justify-center my-7 text-center">
+        <button 
+          id="interactiveWaxSeal" 
+          class="wax-seal w-20 h-20 rounded-full flex flex-col items-center justify-center text-[#ffdf9e] border-2 border-dashed border-[#e5bc6e] cursor-pointer"
+          title="Toque para testar e validar o compromisso da garantia"
+        >
+          <span class="font-['Cinzel'] font-black text-[10px] leading-tight uppercase tracking-wider">Lacre</span>
+          <span class="font-['Cinzel'] font-bold text-xs">7 DIAS</span>
+          <span class="text-[9px] uppercase font-sans">Integral</span>
+        </button>
+        <span class="text-xs font-serif italic text-[#715944] mt-2 block">
+          Toque no lacre de cera para romper e selar sua garantia incondicional
+        </span>
+      </div>
+
+      <footer class="mt-8 pt-5 border-t border-[#cbb084]/60 text-xs sm:text-sm text-[#4d3a2b] space-y-3">
+        <p class="leading-relaxed">
+          <strong class="font-['Cinzel'] text-[#8b1d1d]">P.S. 1:</strong> Como eu acompanho sua carteira pessoalmente e me comprometo com a <strong>resposta em até 48 horas úteis</strong>, a capacidade de atendimento é rigorosamente limitada a poucos investidores simultâneos. Uma vez preenchidas as vagas, as inscrições serão suspensas.
+        </p>
+        <p class="leading-relaxed">
+          <strong class="font-['Cinzel'] text-[#8b1d1d]">P.S. 2:</strong> Toque em qualquer parte da carta para agitar a tinta do manuscrito e simular os cálculos com seu próprio patrimônio antes de tomar sua decisão.
+        </p>
+      </footer>
+
+    </article>
+
+    <div class="text-center text-[10px] text-[#8e7354] mt-4 mb-2 font-serif">
+      © Manuscrito Estratégico de Opções • Gestão de Risco & Preservação Patrimonial
+    </div>
+  </main>
+
+  <div id="checkoutModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="parchment-sheet engraved-frame w-full max-w-md rounded-lg p-5 sm:p-6 shadow-2xl relative transform scale-95 transition-transform duration-300" id="modalCard">
+      
+      <button id="closeModalBtn" class="absolute top-3 right-3 text-[#523d2b] hover:text-[#8b1d1d] font-bold text-lg w-7 h-7 flex items-center justify-center rounded-full bg-[#e3d1b1]">
+        ✕
+      </button>
+
+      <div class="text-center mb-4">
+        <div class="wax-seal w-12 h-12 rounded-full mx-auto flex items-center justify-center text-[#ffdf9e] mb-2">
+          <span class="font-['Cinzel'] font-black text-[10px]">OK</span>
+        </div>
+        <h3 class="font-['Cinzel'] text-lg font-bold text-[#291a10]">Reserva de Consultoria</h3>
+        <p class="text-xs text-[#6e5641] font-serif">1 Mês de Acompanhamento em Opções • R$ 97,00</p>
+      </div>
+
+      <div class="bg-[#f0e2ca] p-3 rounded border border-[#cfba95] text-xs text-[#403022] mb-4 space-y-1.5 font-serif">
+        <div class="flex justify-between">
+          <span>• Acompanhamento:</span>
+          <strong>30 dias corridos</strong>
+        </div>
+        <div class="flex justify-between">
+          <span>• Canal de Resposta:</span>
+          <strong>Direto em até 48h úteis</strong>
+        </div>
+        <div class="flex justify-between">
+          <span>• Análise Inicial:</span>
+          <strong>Diagnóstico de Carteira</strong>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="space-y-2">
+        <button id="confirmPurchaseBtn" class="w-full bg-[#8b1d1d] hover:bg-[#721515] text-[#faedd9] font-['Cinzel'] font-bold text-sm py-3 px-4 rounded shadow border border-[#d6a55e] active:scale-95 transition-all">
+          Prosseguir com Inscrição (R$ 97,00)
+        </button>
+        <button id="cancelModalBtn" class="w-full bg-transparent text-[#6e5641] hover:text-[#291a10] font-serif text-xs py-1.5">
+          Voltar e continuar lendo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio and Gamification Notification Toast -->
+  <div id="toastNotification" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 max-w-xs w-[90%] bg-[#22160d] text-[#faedd9] border border-[#c59b3f] p-3 rounded-lg shadow-2xl flex items-center gap-3 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4">
+    <div class="text-2xl" id="toastIcon">✨</div>
+    <div class="text-xs">
+      <div class="font-['Cinzel'] font-bold text-[#f3ca7d]" id="toastTitle">Conquista Desbloqueada</div>
+      <div class="text-[#cfb79a]" id="toastBody">Você subiu de nível na leitura!</div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       1. WEB AUDIO API SYNTHESIZER (Organic ink droplet & coin sounds)
+       ========================================================================= */
+    let audioCtx = null;
+    let isSoundMuted = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioClass) {
+          audioCtx = new AudioClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.12, gainLevel = 0.035) {
+      if (isSoundMuted) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, audioCtx.currentTime + duration);
+
+        gain.gain.setValueAtTime(gainLevel, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        // Tolerates audio policy restrictions
+      }
+    }
+
+    // Toggle sound button
+    const soundToggle = document.getElementById('soundToggle');
+    const soundIcon = document.getElementById('soundIcon');
+    soundToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      initAudio();
+      isSoundMuted = !isSoundMuted;
+      soundIcon.textContent = isSoundMuted ? '🔇' : '🔊';
+      if (!isSoundMuted) {
+        playTone(520, 'sine', 0.15, 0.05);
+      }
+    });
+
+    /* =========================================================================
+       2. INTERACTIVE FLUID RIPPLE ENGINE (Canvas 60fps)
+       ========================================================================= */
+    const canvas = document.getElementById('rippleCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+    let ripples = [];
+
+    function resizeCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Ripple {
+      constructor(x, y, maxRadius = 130, strength = 1.0) {
+        this.x = x;
+        this.y = y;
+        this.radius = 1;
+        this.maxRadius = maxRadius;
+        this.strength = strength;
+        this.alpha = 0.5 * strength;
+        this.speed = 3.0;
+        this.waveCount = 2;
+      }
+
+      update() {
+        this.radius += this.speed;
+        this.alpha = Math.max(0, (1 - this.radius / this.maxRadius) * 0.5 * this.strength);
+        return this.radius < this.maxRadius && this.alpha > 0.005;
+      }
+
+      draw(context) {
+        if (this.alpha <= 0) return;
+        context.save();
+        for (let i = 0; i < this.waveCount; i++) {
+          const r = Math.max(0.1, this.radius - i * 16);
+          const a = Math.max(0, this.alpha * (1 - i * 0.3));
+
+          if (r > 0 && a > 0) {
+            context.beginPath();
+            context.arc(this.x, this.y, r, 0, Math.PI * 2, false);
+            context.strokeStyle = i % 2 === 0
+              ? `rgba(139, 29, 29, ${a * 0.5})`
+              : `rgba(197, 155, 63, ${a * 0.8})`;
+            context.lineWidth = Math.max(1, 3.5 * (1 - this.radius / this.maxRadius));
+            context.stroke();
+          }
+        }
+        context.restore();
+      }
+    }
+
+    function addRipple(x, y, maxRadius = 130, strength = 1.0) {
+      ripples.push(new Ripple(x, y, maxRadius, strength));
+      playTone(320 + Math.random() * 220, 'sine', 0.1, 0.03);
+    }
+
+    function spawnCoinParticle(x, y) {
+      const coin = document.createElement('div');
+      coin.className = 'gold-particle';
+      coin.textContent = Math.random() > 0.5 ? '🪙' : '✨';
+      coin.style.left = `${x}px`;
+      coin.style.top = `${y}px`;
+      document.body.appendChild(coin);
+      setTimeout(() => coin.remove(), 850);
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        if (ripples[i].update()) {
+          ripples[i].draw(ctx);
+        } else {
+          ripples.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Touch & pointer interaction handlers
+    window.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('#soundToggle') || e.target.closest('input[type="range"]')) return;
+      addRipple(e.clientX, e.clientY, 140, 1.0);
+      if (Math.random() > 0.45) {
+        spawnCoinParticle(e.clientX, e.clientY);
+      }
+    }, { passive: true });
+
+    let lastDragTime = 0;
+    window.addEventListener('pointermove', (e) => {
+      if (e.buttons > 0 || e.pointerType === 'touch') {
+        const now = performance.now();
+        if (now - lastDragTime > 65) {
+          lastDragTime = now;
+          addRipple(e.clientX, e.clientY, 85, 0.45);
+        }
+      }
+    }, { passive: true });
+
+    /* =========================================================================
+       3. INTERACTIVE PORTFOLIO & INCOME CALCULATOR
+       ========================================================================= */
+    const portfolioRange = document.getElementById('portfolioRange');
+    const portfolioDisplay = document.getElementById('portfolioDisplay');
+    const monthlyYieldDisplay = document.getElementById('monthlyYieldDisplay');
+    const hedgeLevelDisplay = document.getElementById('hedgeLevelDisplay');
+
+    function updateCalculator() {
+      const val = parseInt(portfolioRange.value, 10);
+      portfolioDisplay.textContent = val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+      
+      // Conservative covered call return (~1.5% per month)
+      const monthlyIncome = Math.round(val * 0.015);
+      monthlyYieldDisplay.textContent = `+ ${monthlyIncome.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })} / mês`;
+
+      if (val < 40000) {
+        hedgeLevelDisplay.textContent = '🛡️ Venda Coberta Leve';
+      } else if (val < 150000) {
+        hedgeLevelDisplay.textContent = '🛡️ Estrutura Collar / Seguro';
+      } else {
+        hedgeLevelDisplay.textContent = '🛡️ Blindagem Institucional';
+      }
+    }
+    portfolioRange.addEventListener('input', updateCalculator);
+
+    /* =========================================================================
+       4. GAMIFICATION: READING PROGRESS & TOASTS
+       ========================================================================= */
+    const readingProgress = document.getElementById('readingProgress');
+    const rankBadge = document.getElementById('rankBadge');
+    const toast = document.getElementById('toastNotification');
+    const toastTitle = document.getElementById('toastTitle');
+    const toastBody = document.getElementById('toastBody');
+    const toastIcon = document.getElementById('toastIcon');
+
+    let currentLevel = 0;
+    const levels = [
+      { threshold: 0, title: "Nível: Curioso" },
+      { threshold: 25, title: "Nível: Aprendiz de Mercado", desc: "Você começou a enxergar as opções como aluguel!", icon: "📜" },
+      { threshold: 60, title: "Nível: Estrategista Prudente", desc: "Compreendeu a mecânica de risco e proteção.", icon: "⚔️" },
+      { threshold: 90, title: "Nível: Acesso Liberado", desc: "Pronto para destravar sua carteira com a consultoria!", icon: "👑" }
+    ];
+
+    function showToast(title, body, icon = "✨") {
+      toastTitle.textContent = title;
+      toastBody.textContent = body;
+      toastIcon.textContent = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 4000);
+    }
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = Math.min(100, Math.max(0, Math.round((scrollTop / (scrollHeight || 1)) * 100)));
+      
+      readingProgress.style.width = `${Math.max(5, percent)}%`;
+
+      for (let i = levels.length - 1; i >= 0; i--) {
+        if (percent >= levels[i].threshold && currentLevel < i) {
+          currentLevel = i;
+          rankBadge.textContent = levels[i].title;
+          if (levels[i].desc) {
+            showToast(levels[i].title, levels[i].desc, levels[i].icon);
+            playTone(660, 'triangle', 0.25, 0.06);
+            if (i === 3) {
+              confetti({
+                particleCount: 50,
+                spread: 70,
+                origin: { y: 0.15 }
+              });
+            }
+          }
+          break;
+        }
+      }
+    }, { passive: true });
+
+    /* =========================================================================
+       5. WAX SEAL & MODAL CHECKOUT
+       ========================================================================= */
+    const interactiveWaxSeal = document.getElementById('interactiveWaxSeal');
+    const checkoutModal = document.getElementById('checkoutModal');
+    const modalCard = document.getElementById('modalCard');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const mainCtaButton = document.getElementById('mainCtaButton');
+    const confirmPurchaseBtn = document.getElementById('confirmPurchaseBtn');
+
+    function openModal() {
+      checkoutModal.classList.remove('opacity-0', 'pointer-events-none');
+      checkoutModal.classList.add('opacity-100');
+      modalCard.classList.remove('scale-95');
+      modalCard.classList.add('scale-100');
+      playTone(550, 'sine', 0.18, 0.05);
+    }
+
+    function closeModal() {
+      checkoutModal.classList.add('opacity-0', 'pointer-events-none');
+      checkoutModal.classList.remove('opacity-100');
+      modalCard.classList.add('scale-95');
+      modalCard.classList.remove('scale-100');
+    }
+
+    interactiveWaxSeal.addEventListener('click', (e) => {
+      const rect = interactiveWaxSeal.getBoundingClientRect();
+      confetti({
+        particleCount: 45,
+        spread: 60,
+        colors: ['#c59b3f', '#8b1d1d', '#ffd700'],
+        origin: {
+          x: (rect.left + rect.width / 2) / window.innerWidth,
+          y: (rect.top + rect.height / 2) / window.innerHeight
+        }
+      });
+      playTone(440, 'triangle', 0.2, 0.05);
+      showToast("Garantia Selada!", "Seus 7 dias incondicionais estão formalizados neste despacho.", "🛡️");
+    });
+
+    mainCtaButton.addEventListener('click', () => {
+      confetti({
+        particleCount: 65,
+        spread: 80,
+        origin: { y: 0.85 }
+      });
+      openModal();
+    });
+
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelModalBtn.addEventListener('click', closeModal);
+    checkoutModal.addEventListener('click', (e) => {
+      if (e.target === checkoutModal) closeModal();
+    });
+
+    confirmPurchaseBtn.addEventListener('click', () => {
+      confirmPurchaseBtn.textContent = 'Processando Reserva Segura...';
+      confirmPurchaseBtn.disabled = true;
+      setTimeout(() => {
+        closeModal();
+        confirmPurchaseBtn.textContent = 'Prosseguir com Inscrição (R$ 97,00)';
+        confirmPurchaseBtn.disabled = false;
+        showToast("Vaga Reservada!", "Redirecionando para o ambiente seguro de consulta...", "✅");
+      }, 1200);
+    });
+
+    // Initial subtle ripple on launch
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        addRipple(window.innerWidth / 2, window.innerHeight * 0.35, 140, 0.8);
+      }, 350);
+    });
+  </script>
+</body>
+</html>
